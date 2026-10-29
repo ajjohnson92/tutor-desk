@@ -2,7 +2,7 @@
 <html lang="en-GB">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#1e1f22">
 <meta name="robots" content="noindex, nofollow">
 <title>Tutor Desk</title>
@@ -34,7 +34,7 @@
   --g-fill: #dcf5f3; --g-text: #0f5753; --g-line: #2fb3ac;
 }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-html, body { margin: 0; background: var(--bg); color: var(--fg); }
+html, body { margin: 0; background: var(--bg); color: var(--fg); touch-action: pan-x pan-y; }  /* the page never zooms */
 body { font: 14px/1.35 "Segoe UI", system-ui, -apple-system, Roboto, sans-serif; min-height: 100vh;
   padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom); }
 button { font: inherit; color: var(--fg); background: var(--surface); border: 1px solid var(--border);
@@ -428,7 +428,7 @@ const mid = (e) => (e.touches[0].clientY + e.touches[1].clientY) / 2;
 $("cal").addEventListener("touchstart", (e) => {
   if (e.touches.length === 2) {
     touch = null;
-    const hours = $("cal").querySelector(".hours");
+    const hours = e.target.closest && e.target.closest(".hours");  // only a pinch on the hours themselves
     if (!hours) return;
     const y = mid(e) - hours.getBoundingClientRect().top;
     pinch = {hours, gap: gap(e), zoom: zoomY, z: zoomY, y, minute: draw.first * 60 + y / draw.hourH * 60, at: mid(e)};
@@ -442,6 +442,8 @@ $("cal").addEventListener("touchmove", (e) => {
   pinch.hours.style.transform = `translateY(${mid(e) - pinch.at}px) scaleY(${pinch.z / pinch.zoom})`;
   pinch.at2 = mid(e);
 }, {passive: false});
+// two fingers anywhere else on the page do nothing (no page zoom; only the calendar's hours stretch)
+document.addEventListener("touchmove", (e) => { if (e.touches.length > 1) e.preventDefault(); }, {passive: false});
 $("cal").addEventListener("touchcancel", (e) => { touch = null; if (pinch) $("cal").dispatchEvent(new TouchEvent("touchend")); });
 $("cal").addEventListener("touchend", (e) => {
   if (pinch) {
@@ -592,7 +594,12 @@ document.addEventListener("visibilitychange", () => { if (!document.hidden && sn
 setInterval(() => { if (snap && !document.hidden) draw(false); }, 60000);  // keeps the time line and "ago" moving
 
 document.documentElement.dataset.theme = store.get("theme") || "dark";
-if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+if ("serviceWorker" in navigator) {
+  // when Tutor Desk has uploaded a new version of this page, reload once to show it (not on the very first visit)
+  const hadOne = !!navigator.serviceWorker.controller;
+  navigator.serviceWorker.addEventListener("controllerchange", () => { if (hadOne) location.reload(); });
+  navigator.serviceWorker.register("sw.js").then((r) => r.update()).catch(() => {});
+}
 start();
 </script>
 </body>
