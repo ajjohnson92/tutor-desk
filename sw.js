@@ -1,6 +1,6 @@
 // Keeps the phone page working offline: the page itself from the cache (refreshed in the background), and the
 // locked snapshot from the network when there's signal, otherwise the last copy downloaded.
-const SHELL = "tutor-desk-shell-v2";  // change this whenever the page changes, so phones drop the old copy
+const SHELL = "tutor-desk-shell-v3";  // change this whenever the page changes, so phones drop the old copy
 const DATA = "tutor-desk-data";
 const FILES = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png"];
 
