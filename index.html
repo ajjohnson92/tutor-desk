@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1e1f22">
+<meta name="robots" content="noindex, nofollow">
+<title>Tutor Desk</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+/* Tutor Desk's own colours (theme.py), dark and light */
+:root, :root[data-theme="dark"] {
+  --bg: #1e1f22; --surface: #2b2d31; --field: #313338; --border: #3f4147;
+  --fg: #e8e9eb; --muted: #9ba1a9; --accent: #4c8bf5; --amber: #e0a040; --now: #ef4444;
+  --c-fill: #24406b; --c-text: #dbe6fb; --c-line: #4c8bf5;
+  --p-fill: #33294d; --p-text: #d6c9f7; --p-line: #9b7fe0;
+  --d-fill: #1d3b2a; --d-text: #9fdcb2; --d-line: #2f6a47;
+  --a-fill: #3a2c14; --a-text: #f7c27a; --a-line: #e0a040;
+  --o-fill: #47263a; --o-text: #f8c8de; --o-line: #e889b5;
+  --x-fill: #333438; --x-text: #c4c7cd; --x-line: #616161;
+  --g-fill: #16393a; --g-text: #a7e3e0; --g-line: #2fb3ac;
+}
+:root[data-theme="light"] {
+  --bg: #f5f5f4; --surface: #e9e9e7; --field: #ffffff; --border: #c9c9c6;
+  --fg: #1f2328; --muted: #6b7280; --accent: #2563eb; --amber: #b45309; --now: #ef4444;
+  --c-fill: #dbe6fb; --c-text: #1b2f55; --c-line: #213d64;
+  --p-fill: #ece6fb; --p-text: #4a3486; --p-line: #9b7fe0;
+  --d-fill: #dcf2e3; --d-text: #1d6b3a; --d-line: #43a047;
+  --a-fill: #fdf0dc; --a-text: #8a4b08; --a-line: #e0a040;
+  --o-fill: #fde3ef; --o-text: #8a2453; --o-line: #e889b5;
+  --x-fill: #ececec; --x-text: #3a3a3a; --x-line: #616161;
+  --g-fill: #dcf5f3; --g-text: #0f5753; --g-line: #2fb3ac;
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; background: var(--bg); color: var(--fg); }
+body { font: 14px/1.35 "Segoe UI", system-ui, -apple-system, Roboto, sans-serif; min-height: 100vh;
+  padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom); }
+button { font: inherit; color: var(--fg); background: var(--surface); border: 1px solid var(--border);
+  border-radius: 6px; padding: 7px 12px; cursor: pointer; }
+button:active { background: var(--field); }
+button.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+.muted { color: var(--muted); }
+.hidden { display: none !important; }
+
+/* top bar, like Tutor Desk's */
+header { display: flex; align-items: center; gap: 10px; padding: 12px 16px 8px; }
+header h1 { font-size: 20px; margin: 0; font-weight: 700; flex: 1; }
+.synced { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
+.synced .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); }
+.synced.stale { color: var(--amber); } .synced.stale .dot { background: var(--amber); }
+.icon-btn { padding: 5px 9px; font-size: 16px; line-height: 1; }
+.tabs { display: flex; gap: 2px; padding: 0 16px; border-bottom: 1px solid var(--border); overflow-x: auto; }
+.tab { padding: 8px 16px; border: 1px solid transparent; border-bottom: none; border-radius: 6px 6px 0 0;
+  color: var(--muted); background: none; }
+.tab.on { color: var(--fg); background: var(--surface); border-color: var(--border); font-weight: 600;
+  margin-bottom: -1px; }
+main { padding: 10px 16px 24px; }
+
+/* calendar toolbar */
+.bar { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.bar .week { font-weight: 600; flex: 1; min-width: 120px; text-align: center; }
+.seg { display: inline-flex; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+.seg button { border: none; border-radius: 0; background: var(--surface); padding: 6px 12px; }
+.seg button.on { background: var(--accent); color: #fff; }
+.info { font-size: 12px; margin: 6px 0 8px; }
+.days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin: 8px 0; }
+.days button { padding: 5px 0; display: flex; flex-direction: column; align-items: center; gap: 1px; font-size: 12px; }
+.days button b { font-size: 15px; }
+.days button.today { color: var(--accent); }
+.days button.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+.days button .pip { width: 5px; height: 5px; border-radius: 50%; background: currentColor; opacity: .7; }
+.days button .pip.none { opacity: 0; }
+
+/* the grid */
+.cal { position: relative; border-top: 1px solid var(--border); user-select: none; }
+.colheads { display: grid; margin-left: 44px; }
+.colheads div { text-align: center; font-size: 12px; font-weight: 600; padding: 4px 0; }
+.colheads div.today { color: var(--accent); }
+.allday { margin-left: 44px; display: grid; gap: 0 2px; }
+.allday .ad { font-size: 11px; margin: 1px 2px; padding: 1px 5px; border-radius: 3px; white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis; background: var(--g-fill); color: var(--g-text);
+  border: 1px solid var(--g-line); }
+.hours { position: relative; }
+.hour { position: absolute; left: 0; right: 0; border-top: 1px solid var(--border); }
+.hour span { position: absolute; left: 0; top: 2px; width: 38px; text-align: right; font-size: 11px; color: var(--muted); }
+.col { position: absolute; top: 0; bottom: 0; background: var(--surface); border-left: 1px solid var(--border); }
+.col .work { position: absolute; left: 0; right: 0; background: var(--bg); }
+.ev { position: absolute; border: 1px solid; border-radius: 4px; padding: 2px 4px; overflow: hidden;
+  font-size: 12px; line-height: 1.25; cursor: pointer; }
+.ev.dash { border-style: dashed; }
+.ev small { display: block; opacity: .85; font-size: 11px; }
+.week-view .ev { font-size: 10px; padding: 1px 2px; } .week-view .ev small { font-size: 9px; }
+.now { position: absolute; height: 2px; background: var(--now); z-index: 3; }
+.note { text-align: center; color: var(--muted); padding: 28px 8px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 14px; font-size: 12px; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 5px; }
+.legend i { width: 14px; height: 10px; border: 1px solid; border-radius: 2px; display: inline-block; }
+
+/* details sheet */
+.sheet-bg { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 10; display: flex; align-items: flex-end; }
+.sheet { background: var(--surface); border-top: 1px solid var(--border); width: 100%; border-radius: 12px 12px 0 0;
+  padding: 16px 16px calc(16px + env(safe-area-inset-bottom)); }
+.sheet h2 { font-size: 17px; margin: 6px 0 4px; }
+.sheet .kind { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; padding: 2px 8px; border-radius: 10px; border: 1px solid; }
+.sheet p { margin: 6px 0; }
+.sheet .full { font-size: 12px; word-break: break-word; }
+
+/* lock screen */
+.lock { max-width: 380px; width: calc(100% - 32px); margin: 12vh auto 0; padding: 24px 20px; background: var(--surface);
+  border: 1px solid var(--border); border-radius: 10px; text-align: center; }
+.lock img { width: 64px; height: 64px; border-radius: 14px; }
+.lock h1 { font-size: 20px; margin: 8px 0 4px; }
+.lock input { width: 100%; margin: 14px 0 10px; padding: 10px; font: 600 17px/1 ui-monospace, Consolas, monospace;
+  letter-spacing: 1px; text-align: center; background: var(--field); color: var(--fg); border: 1px solid var(--border);
+  border-radius: 6px; text-transform: uppercase; }
+.lock input:focus { outline: 2px solid var(--accent); border-color: transparent; }
+.lock .err { color: var(--now); min-height: 1.3em; font-size: 13px; }
+.lock button { width: 100%; padding: 10px; }
+</style>
+</head>
+<body>
+<div id="lock" class="lock hidden">
+  <img src="icon-192.png" alt="">
+  <h1>Tutor Desk</h1>
+  <div class="muted">Enter your phone code. It's in Tutor Desk on your PC: Settings (the cog) → Phone view → Show code.</div>
+  <form id="lockForm">
+    <input id="code" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="XXXX-XXXX-XXXX-XXXX-XXXX">
+    <div class="err" id="lockErr"></div>
+    <button class="primary" id="unlockBtn">Unlock</button>
+  </form>
+</div>
+
+<div id="app" class="hidden">
+  <header>
+    <h1>Tutor Desk</h1>
+    <div class="synced" id="synced"><span class="dot"></span><span id="syncedText"></span></div>
+    <button class="icon-btn" id="reload" title="Check for a newer copy" aria-label="Check for a newer copy">↻</button>
+  </header>
+  <nav class="tabs"><button class="tab on">Calendar</button></nav>
+  <main>
+    <div class="bar">
+      <button id="prev" aria-label="Previous">‹</button>
+      <div class="week" id="weekLabel"></div>
+      <button id="next" aria-label="Next">›</button>
+      <button id="today">Today</button>
+      <div class="seg"><button id="vDay">Day</button><button id="vWeek">Week</button></div>
+    </div>
+    <div class="info muted" id="info"></div>
+    <div class="days" id="days"></div>
+    <div id="cal"></div>
+    <div class="legend" id="legend"></div>
+  </main>
+</div>
+<div id="sheet" class="sheet-bg hidden"></div>
+
+<script>
+"use strict";
+const KINDS = {
+  "Confirmed": ["c", "Confirmed"], "Provisional": ["p", "Provisional"], "Completed": ["d", "Completed"],
+  "Application Proposed Availability": ["a", "Offered in an application"],
+  "Outlook Events (view only)": ["o", "Outlook"], "Other": ["x", "Other"], "Google": ["g", "Google Calendar"],
+};
+const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+const $ = (id) => document.getElementById(id);
+const store = {  // localStorage can be unavailable (private tabs); the page still works without it
+  get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} },
+};
+let snap = null, view = store.get("view") || (innerWidth < 600 ? "day" : "week");
+let weekStart = monday(new Date()), dayIdx = (new Date().getDay() + 6) % 7;
+
+// ---- dates (all local; the snapshot's dates are UK dates as text)
+function monday(d) { const m = new Date(d.getFullYear(), d.getMonth(), d.getDate()); m.setDate(m.getDate() - (m.getDay() + 6) % 7); return m; }
+function addDays(d, n) { const x = new Date(d); x.setDate(x.getDate() + n); return x; }
+function iso(d) { return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; }
+function parseIso(s) { const [y, m, d] = s.slice(0, 10).split("-").map(Number); return new Date(y, m - 1, d); }
+function mins(hhmm) { const [h, m] = hhmm.split(":").map(Number); return h * 60 + m; }
+function hhmm(m) { return `${String(Math.floor(m / 60) % 24).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`; }
+const fmt = (d, o) => d.toLocaleDateString("en-GB", o);
+function ago(s) {
+  if (!s) return "never";
+  const m = Math.floor((Date.now() - new Date(s)) / 60000);
+  return m < 1 ? "just now" : m < 60 ? `${m} min ago` : m < 2880 ? `${Math.floor(m / 60)} h ago` : `${Math.floor(m / 1440)} days ago`;
+}
+function esc(s) { return String(s).replace(/[&<>"]/g, (c) => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[c])); }
+
+// ---- unlocking: the key is made from the code once, then kept (not the code) in this browser's IndexedDB
+const b64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+function db() {
+  return new Promise((ok, bad) => {
+    const r = indexedDB.open("tutor-desk", 1);
+    r.onupgradeneeded = () => r.result.createObjectStore("keys");
+    r.onsuccess = () => ok(r.result); r.onerror = () => bad(r.error);
+  });
+}
+async function keyGet() {
+  try { const d = await db(); return await new Promise((ok) => { const q = d.transaction("keys").objectStore("keys").get("key"); q.onsuccess = () => ok(q.result); q.onerror = () => ok(null); }); }
+  catch (e) { return null; }
+}
+async function keyPut(v) {
+  try { const d = await db(); await new Promise((ok) => { const t = d.transaction("keys", "readwrite"); t.objectStore("keys").put(v, "key"); t.oncomplete = ok; t.onerror = ok; }); } catch (e) {}
+}
+async function makeKey(code, locked) {
+  const raw = new TextEncoder().encode(code.toUpperCase().replace(/[^A-Z0-9]/g, ""));
+  const base = await crypto.subtle.importKey("raw", raw, "PBKDF2", false, ["deriveKey"]);
+  return crypto.subtle.deriveKey({name: "PBKDF2", hash: "SHA-256", salt: b64(locked.salt), iterations: locked.iter},
+    base, {name: "AES-GCM", length: 256}, false, ["decrypt"]);
+}
+async function unlock(key, locked) {
+  const plain = await crypto.subtle.decrypt({name: "AES-GCM", iv: b64(locked.iv)}, key, b64(locked.data));
+  return JSON.parse(new TextDecoder().decode(plain));
+}
+async function fetchLocked() {
+  const r = await fetch(`snapshot.json?t=${Date.now()}`, {cache: "no-store"});
+  if (!r.ok) throw new Error(r.status === 503 ? "offline" : `HTTP ${r.status}`);
+  return r.json();
+}
+
+let locked = null;
+async function start() {
+  try { locked = await fetchLocked(); }
+  catch (e) { return showLock("Couldn't download your calendar" + (e.message === "offline" ? " - no signal, and nothing saved yet." : ` (${e.message}).`)); }
+  const saved = await keyGet();
+  if (saved && saved.salt === locked.salt) {
+    try { return show(await unlock(saved.key, locked)); } catch (e) { /* the code changed: ask again */ }
+  }
+  showLock("");
+}
+function showLock(msg) {
+  $("app").classList.add("hidden"); $("lock").classList.remove("hidden");
+  $("lockErr").textContent = msg;
+}
+$("lockForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  if (!locked) return start();
+  $("unlockBtn").disabled = true; $("lockErr").textContent = "";
+  try {
+    const key = await makeKey($("code").value, locked);
+    const data = await unlock(key, locked);
+    await keyPut({salt: locked.salt, key});
+    $("code").value = "";
+    show(data);
+  } catch (err) { $("lockErr").textContent = "That code didn't unlock it - check it in Tutor Desk and try again."; }
+  $("unlockBtn").disabled = false;
+});
+
+// ---- showing it
+function show(data) {
+  snap = data;
+  document.documentElement.dataset.theme = data.theme === "light" ? "light" : "dark";
+  store.set("theme", document.documentElement.dataset.theme);
+  document.querySelector('meta[name="theme-color"]').content = getComputedStyle(document.documentElement).getPropertyValue("--bg").trim();
+  $("lock").classList.add("hidden"); $("app").classList.remove("hidden");
+  const age = (Date.now() - new Date(data.synced || data.made)) / 3600000;
+  $("synced").classList.toggle("stale", age > 48);
+  $("syncedText").textContent = data.synced ? `Synced ${ago(data.synced)}` : `Updated ${ago(data.made)}`;
+  draw();
+}
+$("reload").addEventListener("click", () => { $("syncedText").textContent = "Checking..."; start(); });
+$("prev").addEventListener("click", () => step(-1));
+$("next").addEventListener("click", () => step(1));
+$("today").addEventListener("click", () => { weekStart = monday(new Date()); dayIdx = (new Date().getDay() + 6) % 7; draw(true); });
+$("vDay").addEventListener("click", () => { view = "day"; store.set("view", view); draw(true); });
+$("vWeek").addEventListener("click", () => { view = "week"; store.set("view", view); draw(true); });
+function step(n) {
+  if (view === "week") weekStart = addDays(weekStart, 7 * n);
+  else { dayIdx += n; if (dayIdx < 0) { dayIdx = 6; weekStart = addDays(weekStart, -7); } if (dayIdx > 6) { dayIdx = 0; weekStart = addDays(weekStart, 7); } }
+  draw();
+}
+let touch = null;  // swipe left / right to move a day (or a week)
+$("cal").addEventListener("touchstart", (e) => { touch = [e.touches[0].clientX, e.touches[0].clientY]; }, {passive: true});
+$("cal").addEventListener("touchend", (e) => {
+  if (!touch) return;
+  const dx = e.changedTouches[0].clientX - touch[0], dy = e.changedTouches[0].clientY - touch[1];
+  touch = null;
+  if (Math.abs(dx) > 60 && Math.abs(dx) > 2 * Math.abs(dy)) step(dx < 0 ? 1 : -1);
+});
+
+function lanes(events) {  // side by side for overlapping entries, as in the Calendar tab
+  const out = []; let group = [], groupEnd = -1, ends = [];
+  const sorted = [...events].sort((a, b) => mins(a.start) - mins(b.start) || b.minutes - a.minutes);
+  for (const e of sorted) {
+    const s = mins(e.start), f = s + Math.max(e.minutes, 20);
+    if (s >= groupEnd && group.length) { group.forEach(([g, l]) => out.push([g, l, ends.length])); group = []; ends = []; }
+    let lane = ends.findIndex((end) => end <= s);
+    if (lane < 0) { ends.push(f); lane = ends.length - 1; } else ends[lane] = f;
+    group.push([e, lane]);
+    groupEnd = group.length > 1 ? Math.max(groupEnd, f) : f;
+  }
+  group.forEach(([g, l]) => out.push([g, l, ends.length]));
+  return out;
+}
+
+function draw(scroll) {
+  if (!snap) return;
+  const today = iso(new Date()), sun = addDays(weekStart, 6);
+  const week = [...Array(7)].map((_, i) => iso(addDays(weekStart, i)));
+  const shown = view === "week" ? week : [week[dayIdx]];
+  $("vDay").classList.toggle("on", view === "day"); $("vWeek").classList.toggle("on", view === "week");
+  $("weekLabel").textContent = view === "week" || innerWidth >= 420
+    ? `${fmt(weekStart, {day: "numeric", month: "short"})} – ${fmt(sun, {day: "numeric", month: "short", year: "numeric"})}`
+    : fmt(parseIso(week[dayIdx]), {weekday: "long", day: "numeric", month: "long"});
+  const read = snap.weeks_read[iso(weekStart)];
+  $("info").textContent = (read ? `This week read from the portal ${ago(read)}` : "This week hasn't been read from the portal")
+    + (snap.google_fetched ? ` · Google ${ago(snap.google_fetched)}` : "") + ` · copied to phone ${ago(snap.made)}`;
+
+  const timed = snap.events.filter((e) => week.includes(e.date)).map((e) => ({...e, src: "portal"}))
+    .concat(snap.google.filter((e) => week.includes(e.date) && !e.all_day).map((e) => ({...e, src: "google", kind: "Google", name: e.title})));
+  const allDay = snap.google.filter((e) => e.all_day && shown.includes(e.date));
+
+  // the day picker (day view)
+  $("days").classList.toggle("hidden", view !== "day");
+  $("days").innerHTML = week.map((d, i) => {
+    const has = timed.some((e) => e.date === d) || snap.google.some((e) => e.date === d && e.all_day);
+    return `<button data-i="${i}" class="${i === dayIdx ? "on" : ""} ${d === today ? "today" : ""}">${DAYS[i]}<b>${parseIso(d).getDate()}</b><span class="pip ${has ? "" : "none"}"></span></button>`;
+  }).join("");
+  $("days").querySelectorAll("button").forEach((b) => b.addEventListener("click", () => { dayIdx = +b.dataset.i; draw(); }));
+
+  const inView = timed.filter((e) => shown.includes(e.date));
+  const span = view === "week" ? timed : inView;  // the hours shown: 07:00-21:00, stretched to fit what's there
+  const first = Math.floor(Math.min(7 * 60, ...span.map((e) => mins(e.start))) / 60);
+  const last = Math.ceil(Math.max(21 * 60, ...span.map((e) => mins(e.start) + e.minutes)) / 60);
+  const hourH = view === "week" ? 40 : 52, gutter = 44, n = shown.length;
+  const y = (m) => (m / 60 - first) * hourH;
+  const colW = `((100% - ${gutter}px) / ${n})`;
+  const colLeft = (i) => `calc(${gutter}px + ${colW} * ${i})`;
+
+  let h = "";
+  if (view === "week") {
+    h += `<div class="colheads" style="grid-template-columns:repeat(7,1fr)">` + week.map((d, i) =>
+      `<div class="${d === today ? "today" : ""}">${DAYS[i].slice(0, view === "week" && innerWidth < 420 ? 1 : 3)} ${parseIso(d).getDate()}</div>`).join("") + `</div>`;
+  }
+  if (allDay.length) {
+    h += `<div class="allday" style="grid-template-columns:repeat(${n},minmax(0,1fr))">` + shown.map((d) =>
+      `<div>${allDay.filter((e) => e.date === d).map((e) =>
+        `<div class="ad" data-g="${esc(e.title)}" data-d="${d}">${esc(e.title)}</div>`).join("")}</div>`).join("") + `</div>`;
+  }
+  h += `<div class="hours" style="height:${(last - first) * hourH + 4}px">`;
+  shown.forEach((d, i) => {
+    const wh = snap.working_hours[DAYS[parseIso(d).getDay() === 0 ? 6 : parseIso(d).getDay() - 1]];
+    h += `<div class="col" style="left:${colLeft(i)};width:calc(${colW})">` +
+      (wh ? `<div class="work" style="top:${Math.max(0, y(mins(wh[0])))}px;height:${y(mins(wh[1])) - Math.max(0, y(mins(wh[0])))}px"></div>` : "") + `</div>`;
+  });
+  for (let hr = first; hr <= last; hr++) h += `<div class="hour" style="top:${y(hr * 60)}px">${hr < last ? `<span>${String(hr).padStart(2, "0")}:00</span>` : ""}</div>`;
+  const now = new Date(), nowM = now.getHours() * 60 + now.getMinutes();
+  const ti = shown.indexOf(today);
+  if (ti >= 0 && nowM >= first * 60 && nowM <= last * 60) h += `<div class="now" style="top:${y(nowM)}px;left:${colLeft(ti)};width:calc(${colW})"></div>`;
+  const items = [];
+  shown.forEach((d, i) => {
+    for (const [e, lane, nl] of lanes(inView.filter((x) => x.date === d))) {
+      const [k] = KINDS[e.kind] || KINDS.Other, s = mins(e.start);
+      const top = y(s) + 1, height = Math.max(16, y(s + e.minutes) - y(s) - 2);
+      const left = `calc(${colLeft(i)} + 3px + (${colW} - 6px) / ${nl} * ${lane})`;
+      const width = `calc((${colW} - 6px) / ${nl} - ${nl > 1 ? 2 : 0}px)`;
+      const dash = e.kind === "Provisional" || e.kind === "Application Proposed Availability";
+      const detail = e.src === "portal" ? [e.subject, e.job].filter(Boolean).join(" · ") : "";
+      items.push(e);
+      h += `<div class="ev ${dash ? "dash" : ""}" data-n="${items.length - 1}" style="top:${top}px;height:${height}px;left:${left};width:${width};` +
+        `background:var(--${k}-fill);color:var(--${k}-text);border-color:var(--${k}-line)">${e.start} ${esc(e.name)}` +
+        (detail && height > 34 ? `<small>${esc(detail)}</small>` : "") + `</div>`;
+    }
+  });
+  h += `</div>`;
+  if (!read && new Date(sun) >= monday(new Date())) h += `<div class="note">This week hasn't been read from the portal yet - Sync everything in Tutor Desk reads ahead.</div>`;
+  else if (!read) h += `<div class="note">Weeks before this one aren't kept.</div>`;
+  else if (!inView.length && !allDay.length) h += `<div class="note">Nothing in your calendar ${view === "week" ? "this week" : "this day"}.</div>`;
+
+  const cal = $("cal");
+  cal.className = `cal ${view}-view`;
+  cal.innerHTML = h;
+  cal.querySelectorAll(".ev").forEach((el) => el.addEventListener("click", () => details(items[+el.dataset.n])));
+  cal.querySelectorAll(".allday [data-g]").forEach((el) => el.addEventListener("click", () =>
+    details({src: "google", kind: "Google", date: el.dataset.d, title: el.dataset.g, all_day: true})));
+  $("legend").innerHTML = Object.entries(KINDS).filter(([kind]) => kind !== "Other").map(([, [k, label]]) =>
+    `<span><i style="background:var(--${k}-fill);border-color:var(--${k}-line)"></i>${label}</span>`).join("");
+  if (scroll !== false) {  // start at the current time (or the first lesson)
+    const target = ti >= 0 ? nowM - 90 : Math.min(...inView.map((e) => mins(e.start)), 9 * 60) - 30;
+    const top = cal.querySelector(".hours").getBoundingClientRect().top + scrollY + y(Math.max(first * 60, target)) - 120;
+    if (scroll === true || !draw.scrolled) { scrollTo({top: Math.max(0, top), behavior: draw.scrolled ? "smooth" : "auto"}); draw.scrolled = true; }
+  }
+}
+
+function details(e) {
+  const [k, label] = KINDS[e.kind] || KINDS.Other, d = parseIso(e.date);
+  const when = e.all_day ? "all day" : `${e.start}–${hhmm(mins(e.start) + e.minutes)}`;
+  const body = e.src === "portal"
+    ? `<h2>${esc(e.name)}</h2>${e.subject ? `<p>${esc(e.subject)}</p>` : ""}${e.job ? `<p class="muted">${esc(e.job)}</p>` : ""}<p class="full muted">${esc(e.title)}</p>`
+    : `<h2>${esc(e.title)}</h2>`;
+  $("sheet").innerHTML = `<div class="sheet"><div class="muted">${fmt(d, {weekday: "long", day: "numeric", month: "long"})} · ${when}</div>` +
+    `<span class="kind" style="background:var(--${k}-fill);color:var(--${k}-text);border-color:var(--${k}-line)">${label}</span>${body}` +
+    `<button style="width:100%;margin-top:10px" id="closeSheet">Close</button></div>`;
+  $("sheet").classList.remove("hidden");
+  $("closeSheet").addEventListener("click", () => $("sheet").classList.add("hidden"));
+}
+$("sheet").addEventListener("click", (e) => { if (e.target.id === "sheet") $("sheet").classList.add("hidden"); });
+addEventListener("resize", () => draw(false));
+document.addEventListener("visibilitychange", () => { if (!document.hidden && snap) start(); });
+setInterval(() => { if (snap && !document.hidden) draw(false); }, 60000);  // keeps the time line and "ago" moving
+
+document.documentElement.dataset.theme = store.get("theme") || "dark";
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+start();
+</script>
+</body>
+</html>
