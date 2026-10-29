@@ -74,7 +74,7 @@ main { padding: 10px 16px 24px; }
 .days button .pip.none { opacity: 0; }
 
 /* the grid */
-.cal { position: relative; border-top: 1px solid var(--border); user-select: none; }
+.cal { position: relative; border-top: 1px solid var(--border); user-select: none; touch-action: pan-x pan-y; }
 .colheads { display: grid; margin-left: 44px; }
 .colheads div { text-align: center; font-size: 12px; font-weight: 600; padding: 4px 0; }
 .colheads div.today { color: var(--accent); }
@@ -418,9 +418,44 @@ function step(n) {  // a week at a time in Week, three days in 3 days, one day i
   weekStart = monday(cur); dayIdx = (cur.getDay() + 6) % 7;
   draw();
 }
-let touch = null;  // swipe left / right to move a day (or a week)
-$("cal").addEventListener("touchstart", (e) => { touch = [e.touches[0].clientX, e.touches[0].clientY]; }, {passive: true});
+// one finger: swipe left / right to move a day (or three, or a week); two fingers: pinch up and down to
+// stretch or squash the hours, keeping the time between your fingers where it is
+// (while pinching the hours are just stretched on screen; they're redrawn properly when you let go, because
+// redrawing under your fingers would stop the touch)
+let touch = null, pinch = null, zoomY = +(store.get("zoomY") || 1);
+const gap = (e) => Math.max(30, Math.abs(e.touches[0].clientY - e.touches[1].clientY));
+const mid = (e) => (e.touches[0].clientY + e.touches[1].clientY) / 2;
+$("cal").addEventListener("touchstart", (e) => {
+  if (e.touches.length === 2) {
+    touch = null;
+    const hours = $("cal").querySelector(".hours");
+    if (!hours) return;
+    const y = mid(e) - hours.getBoundingClientRect().top;
+    pinch = {hours, gap: gap(e), zoom: zoomY, z: zoomY, y, minute: draw.first * 60 + y / draw.hourH * 60, at: mid(e)};
+    hours.style.transformOrigin = `0 ${y}px`;
+  } else if (e.touches.length === 1 && !pinch) touch = [e.touches[0].clientX, e.touches[0].clientY];
+}, {passive: true});
+$("cal").addEventListener("touchmove", (e) => {
+  if (!pinch || e.touches.length !== 2) return;
+  e.preventDefault();  // the page itself doesn't zoom
+  pinch.z = Math.min(3, Math.max(0.4, pinch.zoom * gap(e) / pinch.gap));
+  pinch.hours.style.transform = `translateY(${mid(e) - pinch.at}px) scaleY(${pinch.z / pinch.zoom})`;
+  pinch.at2 = mid(e);
+}, {passive: false});
+$("cal").addEventListener("touchcancel", (e) => { touch = null; if (pinch) $("cal").dispatchEvent(new TouchEvent("touchend")); });
 $("cal").addEventListener("touchend", (e) => {
+  if (pinch) {
+    if (e.touches.length < 2) {  // let go: redraw at the new size, with the pinched time still under your fingers
+      const p = pinch;
+      pinch = null;
+      zoomY = p.z;
+      store.set("zoomY", String(zoomY));
+      draw(false);
+      const hours = $("cal").querySelector(".hours");
+      scrollTo(0, Math.max(0, hours.getBoundingClientRect().top + scrollY + (p.minute / 60 - draw.first) * draw.hourH - (p.at2 ?? p.at)));
+    }
+    return;
+  }
   if (!touch) return;
   const dx = e.changedTouches[0].clientX - touch[0], dy = e.changedTouches[0].clientY - touch[1];
   touch = null;
@@ -476,7 +511,8 @@ function draw(scroll) {
   const span = view === "week" ? timed : inView;  // the hours shown: 07:00-21:00, stretched to fit what's there
   const first = Math.floor(Math.min(7 * 60, ...span.map((e) => mins(e.start))) / 60);
   const last = Math.ceil(Math.max(21 * 60, ...span.map((e) => mins(e.start) + e.minutes)) / 60);
-  const hourH = view === "week" ? 40 : 52, gutter = 44, n = shown.length;
+  const hourH = (view === "week" ? 40 : 52) * zoomY, gutter = 44, n = shown.length;
+  draw.first = first; draw.hourH = hourH;  // for pinching
   const y = (m) => (m / 60 - first) * hourH;
   const colW = `((100% - ${gutter}px) / ${n})`;
   const colLeft = (i) => `calc(${gutter}px + ${colW} * ${i})`;
