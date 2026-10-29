@@ -21,6 +21,10 @@
   --o-fill: #47263a; --o-text: #f8c8de; --o-line: #e889b5;
   --x-fill: #333438; --x-text: #c4c7cd; --x-line: #616161;
   --g-fill: #16393a; --g-text: #a7e3e0; --g-line: #2fb3ac;
+  /* status labels (theme.py "badges") */
+  --b-ns: #2d3445; --b-ns-fg: #b9c6dd; --b-due: #4b2226; --b-due-fg: #f4a3a3; --b-draft: #4a3518; --b-draft-fg: #f7c27a;
+  --b-sub: #1d3b2a; --b-sub-fg: #8fd6a5; --b-skip: #34363c; --b-skip-fg: #9ba1a9; --b-hol: #47263a; --b-hol-fg: #f8c8de;
+  --ok: #3fb27f; --warn: #f2a65a;
 }
 :root[data-theme="light"] {
   --bg: #f5f5f4; --surface: #e9e9e7; --field: #ffffff; --border: #c9c9c6;
@@ -32,6 +36,9 @@
   --o-fill: #fde3ef; --o-text: #8a2453; --o-line: #e889b5;
   --x-fill: #ececec; --x-text: #3a3a3a; --x-line: #616161;
   --g-fill: #dcf5f3; --g-text: #0f5753; --g-line: #2fb3ac;
+  --b-ns: #e3e8f2; --b-ns-fg: #3b4a66; --b-due: #fbdcdc; --b-due-fg: #9b1c1c; --b-draft: #fdebd3; --b-draft-fg: #8a4b08;
+  --b-sub: #dcf2e3; --b-sub-fg: #1d6b3a; --b-skip: #e7e7e5; --b-skip-fg: #6b7280; --b-hol: #fde3ef; --b-hol-fg: #8a2453;
+  --ok: #2e8b57; --warn: #b45309;
 }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body { margin: 0; background: var(--bg); color: var(--fg); touch-action: pan-x pan-y; }  /* the page never zooms */
@@ -52,7 +59,7 @@ header h1 { font-size: 20px; margin: 0; font-weight: 700; flex: 1; }
 .synced.stale { color: var(--amber); } .synced.stale .dot { background: var(--amber); }
 .icon-btn { padding: 5px 9px; font-size: 16px; line-height: 1; }
 .tabs { display: flex; gap: 2px; padding: 0 16px; border-bottom: 1px solid var(--border); overflow-x: auto; }
-.tab { padding: 8px 16px; border: 1px solid transparent; border-bottom: none; border-radius: 6px 6px 0 0;
+.tab { padding: 8px 11px; white-space: nowrap; flex: none; border: 1px solid transparent; border-bottom: none; border-radius: 6px 6px 0 0;
   color: var(--muted); background: none; }
 .tab.on { color: var(--fg); background: var(--surface); border-color: var(--border); font-weight: 600;
   margin-bottom: -1px; }
@@ -123,9 +130,38 @@ select { font: inherit; color: var(--fg); background: var(--surface); border: 1p
 .wk .tot { text-align: right; }
 .wk .nt { grid-column: 1 / -1; font-size: 12px; color: var(--muted); margin-top: -2px; }
 
+/* job applications */
+.seg.wide { display: flex; width: 100%; } .seg.wide button { flex: auto; padding: 7px 6px; font-size: 13px; }
+.filters { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 2px; }
+.filters button { font-size: 12px; padding: 4px 10px; border-radius: 14px; color: var(--muted); }
+.filters button.on { color: var(--fg); border-color: var(--accent); background: var(--field); }
+.filters button.on::before { content: "✓ "; color: var(--accent); }
+.job { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; margin: 6px 0; cursor: pointer; }
+.job .top { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.job .t { font-weight: 600; flex-basis: 100%; margin-top: 3px; }
+.job .sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.job .no { font-size: 12px; color: var(--b-due-fg); margin-top: 2px; }
+.badge { font-size: 11px; font-weight: 600; padding: 1px 8px; border-radius: 3px; white-space: nowrap; }
+.b-new { background: var(--accent); color: #fff; }
+.b-sent { background: var(--surface); color: var(--fg); }
+.b-hid { background: var(--surface); color: var(--muted); }
+.reasons div { display: flex; gap: 6px; margin: 3px 0; }
+.reasons b { width: 14px; flex: none; text-align: center; }
+.sheet h3 { font-size: 14px; margin: 14px 0 4px; }
+.sheet .body { white-space: pre-wrap; font-size: 13px; background: var(--bg); border: 1px solid var(--border);
+  border-radius: 6px; padding: 8px; }
+.sheet a.btn { display: block; text-align: center; text-decoration: none; margin-top: 12px; }
+.stat { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; margin: 8px 0; }
+.stat .row { display: flex; justify-content: space-between; align-items: baseline; }
+.stat .rate { font-size: 22px; font-weight: 700; color: var(--accent); }
+.stat .nums { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-top: 6px; text-align: center; }
+.stat .nums b { display: block; font-size: 17px; }
+.stat .nums span { font-size: 11px; color: var(--muted); }
+
 /* details sheet */
 .sheet-bg { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 10; display: flex; align-items: flex-end; }
 .sheet { background: var(--surface); border-top: 1px solid var(--border); width: 100%; border-radius: 12px 12px 0 0;
+  max-height: 88vh; overflow-y: auto; overscroll-behavior: contain;
   padding: 16px 16px calc(16px + env(safe-area-inset-bottom)); }
 .sheet h2 { font-size: 17px; margin: 6px 0 4px; }
 .sheet .kind { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; padding: 2px 8px; border-radius: 10px; border: 1px solid; }
@@ -163,7 +199,7 @@ select { font: inherit; color: var(--fg); background: var(--surface); border: 1p
     <div class="synced" id="synced"><span class="dot"></span><span id="syncedText"></span></div>
     <button class="icon-btn" id="reload" title="Check for a newer copy" aria-label="Check for a newer copy">↻</button>
   </header>
-  <nav class="tabs"><button class="tab on" data-tab="cal">Calendar</button><button class="tab" data-tab="hours">Hours Tracker</button></nav>
+  <nav class="tabs"><button class="tab on" data-tab="cal">Calendar</button><button class="tab" data-tab="hours">Hours Tracker</button><button class="tab" data-tab="jobs">Job Applications</button></nav>
   <main>
   <section id="calTab">
     <div class="bar">
@@ -190,6 +226,13 @@ select { font: inherit; color: var(--fg); background: var(--surface); border: 1p
     <div class="legend" id="hLegend"></div>
     <div class="weeks" id="hWeeks"></div>
     <div class="muted info" id="hHint"></div>
+  </section>
+  <section id="jobsTab" class="hidden">
+    <div class="seg wide"><button id="jAvail">Available</button><button id="jApps">My applications</button><button id="jStats">Stats</button></div>
+    <div class="filters" id="jFilters"></div>
+    <div class="muted info" id="jSummary"></div>
+    <div id="jList"></div>
+    <div class="muted info" id="jRead"></div>
   </section>
   </main>
 </div>
@@ -300,14 +343,123 @@ function show(data) {
 }
 
 // ---- tabs
-let tab = store.get("tab") === "hours" ? "hours" : "cal";
+let tab = ["hours", "jobs"].includes(store.get("tab")) ? store.get("tab") : "cal";
 function showTab(t) {
   tab = t; store.set("tab", t);
   document.querySelectorAll(".tab").forEach((b) => b.classList.toggle("on", b.dataset.tab === t));
   $("calTab").classList.toggle("hidden", t !== "cal");
   $("hoursTab").classList.toggle("hidden", t !== "hours");
+  $("jobsTab").classList.toggle("hidden", t !== "jobs");
   if (!snap) return;
-  if (t === "cal") draw(); else { scrollTo(0, 0); drawHours(); }
+  if (t === "cal") draw();
+  else { scrollTo(0, 0); t === "hours" ? drawHours() : drawJobs(); }
+}
+
+// ---- Job Applications: Available (scored as in Tutor Desk), My applications and Stats - view only
+const JOB_BADGE = {green: ["Good match", "sub"], amber: ["Possible", "draft"], holiday: ["Holiday / short-term", "hol"], red: ["Not for you", "due"]};
+const APP_BADGE = {Draft: ["Draft", "ns"], Submitted: ["Submitted", "draft"], Successful: ["Successful", "sub"],
+  Unsuccessful: ["Unsuccessful", "due"], Closed: ["Closed", "skip"]};
+const MARK = {"+": ["✓", "var(--ok)"], "-": ["–", "var(--warn)"], x: ["✗", "var(--now)"], "~": ["•", "var(--muted)"]};
+const badge = ([text, k]) => `<span class="badge" style="background:var(--b-${k});color:var(--b-${k}-fg)">${esc(text)}</span>`;
+let jobsMode = store.get("jobsMode") || "available";
+// the filter buttons start as the tick boxes are in Tutor Desk; once changed here, the phone keeps its own
+const jobFilters = {show_red: false, show_holiday: true, show_hidden: false, hide_successful: false, hide_unsuccessful: false};
+let ownFilters = false;
+try { const own = store.get("jobFilters"); if (own) { Object.assign(jobFilters, JSON.parse(own)); ownFilters = true; } } catch (e) {}
+for (const [id, m] of [["jAvail", "available"], ["jApps", "applications"], ["jStats", "stats"]]) {
+  $(id).addEventListener("click", () => { jobsMode = m; store.set("jobsMode", m); scrollTo(0, 0); drawJobs(); });
+}
+const plural = (n, word) => `${n} ${word}${n === 1 ? "" : "s"}`;
+
+function drawJobs() {
+  const J = snap.jobs;
+  if (!J) { $("jList").innerHTML = `<div class="note">Jobs aren't in this copy yet - sync again in Tutor Desk.</div>`; return; }
+  if (!ownFilters && J.view_prefs) Object.assign(jobFilters, J.view_prefs);
+  const live = J.applications.filter((a) => a.status !== "No longer listed").length;
+  $("jAvail").textContent = `Available (${J.available.length})`;
+  $("jApps").textContent = `My applications (${live})`;
+  $("jAvail").classList.toggle("on", jobsMode === "available"); $("jApps").classList.toggle("on", jobsMode === "applications");
+  $("jStats").classList.toggle("on", jobsMode === "stats");
+  $("jRead").textContent = J.last_refresh ? `Jobs read from the portal ${ago(J.last_refresh)}.` : "";
+  const filters = {available: [["show_red", "Not for you"], ["show_holiday", "Holiday work"], ["show_hidden", "Hidden"]],
+    applications: [["hide_successful", "Hide successful"], ["hide_unsuccessful", "Hide unsuccessful"]], stats: []}[jobsMode];
+  $("jFilters").innerHTML = filters.map(([k, label]) => `<button data-k="${k}" class="${jobFilters[k] ? "on" : ""}">${label}</button>`).join("");
+  $("jFilters").querySelectorAll("button").forEach((b) => b.addEventListener("click", () => {
+    jobFilters[b.dataset.k] = !jobFilters[b.dataset.k]; ownFilters = true; store.set("jobFilters", JSON.stringify(jobFilters)); drawJobs();
+  }));
+  if (jobsMode === "stats") return drawStats(J);
+  if (jobsMode === "applications") return drawApps(J);
+
+  const c = {green: 0, amber: 0, holiday: 0, red: 0}; let fresh = 0;
+  J.available.forEach((j) => { c[j.colour]++; fresh += j.new; });
+  $("jSummary").textContent = `${c.green} good · ${c.amber} possible · ${c.holiday} holiday · ${c.red} not for you` + (fresh ? ` · ${fresh} new` : "");
+  const shown = J.available.filter((j) => (j.colour !== "red" || jobFilters.show_red) &&
+    (j.colour !== "holiday" || jobFilters.show_holiday) && (!j.hidden || jobFilters.show_hidden));
+  $("jList").innerHTML = shown.map((j) => {
+    const bits = [j.level, j.subjects.join(" / "), j.hours_per_week ? `${g1(j.hours_per_week)} h/week` : "",
+      j.applicants != null ? plural(j.applicants, "applicant") : "", j.added ? `added ${j.added}` : ""].filter(Boolean);
+    return `<div class="job" data-id="${esc(j.id)}"><div class="top">${badge(JOB_BADGE[j.colour])}` +
+      (j.new ? `<span class="badge b-new">NEW</span>` : j.sent ? `<span class="badge b-sent">SENT TO PORTAL</span>` : "") +
+      (j.hidden ? `<span class="badge b-hid">hidden</span>` : "") +
+      `<span class="t">${esc(j.title)}</span></div><div class="sub">${esc(bits.join("  ·  "))}</div>` +
+      (j.colour === "red" && j.why_not ? `<div class="no">✗ ${esc(j.why_not)}</div>` : "") + `</div>`;
+  }).join("") || `<div class="note">${J.available.length ? "Nothing to show - try the buttons above." : "No jobs yet - Refresh jobs in Tutor Desk."}</div>`;
+  $("jList").querySelectorAll(".job").forEach((el) => el.addEventListener("click", () => jobSheet(J.available.find((j) => j.id === el.dataset.id))));
+}
+
+function drawApps(J) {
+  const hide = new Set([jobFilters.hide_successful && "Successful", jobFilters.hide_unsuccessful && "Unsuccessful"]);
+  const shown = J.applications.filter((a) => !hide.has(a.label));
+  const hidden = J.applications.length - shown.length;
+  $("jSummary").textContent = (hidden ? `${hidden} hidden by the buttons · ` : "") + "From the portal's Applications page"
+    + (J.removed ? ` · ${J.removed} removed in Tutor Desk` : "");
+  $("jList").innerHTML = shown.map((a) => {
+    const bits = [a.level, a.subjects.join(" / "), a.submitted,
+      a.applicants != null ? `${a.applicants} other applicant${a.applicants === 1 ? "" : "s"}` : "", a.client_manager].filter(Boolean);
+    return `<div class="job" data-id="${esc(a.id)}"><div class="top">${badge(APP_BADGE[a.label] || APP_BADGE.Closed)}` +
+      `<span class="muted" style="font-size:12px">${esc(a.id)}</span><span class="t">${esc(a.title)}</span></div>` +
+      `<div class="sub">${esc(bits.join("  ·  "))}</div></div>`;
+  }).join("") || `<div class="note">${J.applications.length ? "Nothing to show - try the buttons above." : "No applications yet."}</div>`;
+  $("jList").querySelectorAll(".job").forEach((el) => el.addEventListener("click", () => appSheet(J.applications.find((a) => a.id === el.dataset.id))));
+}
+
+function drawStats(J) {
+  const S = J.stats;
+  $("jSummary").textContent = `Counting applications from ${S.since ? fmt(new Date(S.since), {day: "numeric", month: "long", year: "numeric"}) : "today"}, when Tutor Desk started recording them.`;
+  $("jList").innerHTML = S.periods.map(([label, c]) => `<div class="stat"><div class="row"><b>${esc(label)}</b>` +
+    `<span><span class="rate">${c.rate == null ? "—" : Math.round(c.rate * 100) + "%"}</span> <span class="muted">success</span></span></div>` +
+    `<div class="nums"><div><b>${c.applications}</b><span>applied</span></div><div><b style="color:var(--ok)">${c.Successful}</b><span>successful</span></div>` +
+    `<div><b style="color:var(--now)">${c.Unsuccessful}</b><span>unsuccessful</span></div><div><b>${c.Waiting}</b><span>waiting</span></div></div></div>`).join("") +
+    `<p class="muted" style="font-size:12px">Success rate = successful out of those decided. The portal never says whether you got a job, so Tutor Desk counts it as successful when a new job appears in your Active Jobs with the same client manager and a similar subject, and unsuccessful if nothing turns up within 14 days.</p>`;
+}
+
+function openSheet(html) {
+  $("sheet").innerHTML = `<div class="sheet">${html}<button style="width:100%;margin-top:12px" id="closeSheet">Close</button></div>`;
+  $("sheet").classList.remove("hidden");
+  $("sheet").firstChild.scrollTop = 0;
+  $("closeSheet").addEventListener("click", () => $("sheet").classList.add("hidden"));
+}
+const section = (title, text) => text ? `<h3>${title}</h3><div>${esc(text)}</div>` : "";
+const portalBtn = (link) => link ? `<a class="btn" href="${esc(link)}" target="_blank" rel="noopener"><button class="primary" style="width:100%">Open in portal</button></a>` : "";
+
+function jobSheet(j) {
+  openSheet(`<div class="top" style="display:flex;gap:6px;flex-wrap:wrap">${badge(JOB_BADGE[j.colour])}${j.new ? `<span class="badge b-new">NEW</span>` : ""}</div>` +
+    `<h2>${esc(j.title)}</h2><div class="muted" style="font-size:12px">${esc(j.meta.concat(j.applicants != null ? [plural(j.applicants, "applicant")] : []).join(" · "))}</div>` +
+    `<div class="reasons" style="margin-top:8px">${j.reasons.map(([s, t]) => `<div><b style="color:${MARK[s][1]}">${MARK[s][0]}</b><span>${esc(t)}</span></div>`).join("")}</div>` +
+    (j.slots.length ? `<h3>Times you could offer</h3>${j.slots.map((s) => `<div>${esc(s)}</div>`).join("")}` : "") +
+    section("Sessions", j.sessions) + section("Student availability", j.availability) +
+    (j.description ? `<h3>Description</h3><div class="body">${esc(j.description)}</div>` : "") + portalBtn(j.link));
+}
+
+function appSheet(a) {
+  const status = a.status === "No longer listed" ? "Closed (no longer on your Applications page)" : a.status;
+  openSheet(`${badge(APP_BADGE[a.label] || APP_BADGE.Closed)}<h2>${esc(a.title)}</h2>` +
+    `<div class="muted" style="font-size:12px">${esc(a.meta.concat(a.applicants != null ? [`${a.applicants} other applicant${a.applicants === 1 ? "" : "s"}`] : []).join(" · "))}</div>` +
+    `<h3>Status: ${esc(status)}</h3>${a.submitted_long ? `<div class="muted">${esc(a.submitted_long)}</div>` : ""}` +
+    `<h3>Outcome: ${esc(a.outcome)}</h3><div class="muted">${esc(a.why.charAt(0).toUpperCase() + a.why.slice(1))}</div>` +
+    section("Sessions", a.sessions) + section("Student availability", a.availability) +
+    (a.pitch ? `<h3>Your experience (as drafted in Tutor Desk)</h3><div class="body">${esc(a.pitch)}</div>`
+      : a.description ? `<h3>Description</h3><div class="body">${esc(a.description)}</div>` : "") + portalBtn(a.link));
 }
 document.querySelectorAll(".tab").forEach((b) => b.addEventListener("click", () => showTab(b.dataset.tab)));
 
