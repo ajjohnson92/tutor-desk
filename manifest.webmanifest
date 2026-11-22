@@ -1,13 +1,13 @@
 {
   "name": "Tutor Desk",
   "short_name": "Tutor Desk",
-  "description": "A view-only window into Tutor Desk: your calendar as of the last sync.",
+  "description": "A view-only window into Tutor Desk, as of the last sync.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
-  "background_color": "#1e1f22",
-  "theme_color": "#1e1f22",
+  "background_color": "#0b0b0c",
+  "theme_color": "#0b0b0c",
   "icons": [
     {"src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
     {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
