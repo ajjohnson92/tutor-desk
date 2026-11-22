@@ -3,17 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<meta name="theme-color" content="#1e1f22">
+<meta name="theme-color" content="#0b0b0c">
 <meta name="robots" content="noindex, nofollow">
 <title>Tutor Desk</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
 <style>
-/* Tutor Desk's own colours (theme.py), dark and light */
+/* Tutor Desk's own colours (theme.py): "Carbon" dark (near-black, greys, one orange accent), and light */
 :root, :root[data-theme="dark"] {
-  --bg: #1e1f22; --surface: #2b2d31; --field: #313338; --border: #3f4147;
-  --fg: #e8e9eb; --muted: #9ba1a9; --accent: #4c8bf5; --amber: #e0a040; --now: #ef4444;
+  --bg: #0b0b0c; --surface: #161618; --field: #1c1c1f; --border: #2a2a2e; --hover: #232326; --side: #080808;
+  --fg: #ececec; --soft: #b8b8b8; --muted: #8a8a8a; --dim: #5e5e5e; --accent: #ff7a45; --accent-fg: #140a05;
+  --tint: #21160f; --tintline: #a8502b; --amber: #ffb15c; --now: #ff5a4f;
   --c-fill: #24406b; --c-text: #dbe6fb; --c-line: #4c8bf5;
   --p-fill: #33294d; --p-text: #d6c9f7; --p-line: #9b7fe0;
   --d-fill: #1d3b2a; --d-text: #9fdcb2; --d-line: #2f6a47;
@@ -22,13 +23,16 @@
   --x-fill: #333438; --x-text: #c4c7cd; --x-line: #616161;
   --g-fill: #16393a; --g-text: #a7e3e0; --g-line: #2fb3ac;
   /* status labels (theme.py "badges") */
-  --b-ns: #2d3445; --b-ns-fg: #b9c6dd; --b-due: #4b2226; --b-due-fg: #f4a3a3; --b-draft: #4a3518; --b-draft-fg: #f7c27a;
-  --b-sub: #1d3b2a; --b-sub-fg: #8fd6a5; --b-skip: #34363c; --b-skip-fg: #9ba1a9; --b-hol: #47263a; --b-hol-fg: #f8c8de;
-  --ok: #3fb27f; --warn: #f2a65a;
+  --b-ns: #26262a; --b-ns-fg: #b5b5b5; --b-due: #4b2226; --b-due-fg: #f4a3a3; --b-draft: #4a3518; --b-draft-fg: #f7c27a;
+  --b-sub: #1d3b2a; --b-sub-fg: #8fd6a5; --b-skip: #222224; --b-skip-fg: #8a8a8a; --b-hol: #47263a; --b-hol-fg: #f8c8de;
+  --b-acc: #3a2516; --b-acc-fg: #ff7a45;
+  --ok: #5cc98a; --warn: #ffb15c;
 }
 :root[data-theme="light"] {
-  --bg: #f5f5f4; --surface: #e9e9e7; --field: #ffffff; --border: #c9c9c6;
-  --fg: #1f2328; --muted: #6b7280; --accent: #2563eb; --amber: #b45309; --now: #ef4444;
+  --bg: #f5f5f4; --surface: #e9e9e7; --field: #ffffff; --border: #c9c9c6; --hover: #dededb; --side: #ebebe9;
+  --fg: #1f2328; --soft: #3a3f45; --muted: #6b7280; --dim: #9ca3af; --accent: #2563eb; --accent-fg: #fff;
+  --tint: #e6eefc; --tintline: #2563eb; --amber: #b45309; --now: #ef4444;
+  --b-acc: #dbe6fb; --b-acc-fg: #1b2f55;
   --c-fill: #dbe6fb; --c-text: #1b2f55; --c-line: #213d64;
   --p-fill: #ece6fb; --p-text: #4a3486; --p-line: #9b7fe0;
   --d-fill: #dcf2e3; --d-text: #1d6b3a; --d-line: #43a047;
@@ -42,41 +46,80 @@
 }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body { margin: 0; background: var(--bg); color: var(--fg); touch-action: pan-x pan-y; }  /* the page never zooms */
-body { font: 14px/1.35 "Segoe UI", system-ui, -apple-system, Roboto, sans-serif; min-height: 100vh;
+body { font: 14px/1.4 "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, Roboto, sans-serif; min-height: 100vh;
   padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom); }
-button { font: inherit; color: var(--fg); background: var(--surface); border: 1px solid var(--border);
-  border-radius: 6px; padding: 7px 12px; cursor: pointer; }
+button { font: inherit; font-weight: 600; color: var(--fg); background: var(--hover); border: 1px solid var(--border);
+  border-radius: 9px; padding: 7px 13px; cursor: pointer; }
 button:active { background: var(--field); }
-button.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
 .muted { color: var(--muted); }
 .hidden { display: none !important; }
 
-/* top bar, like Tutor Desk's */
-header { display: flex; align-items: center; gap: 10px; padding: 12px 16px 8px; }
-header h1 { font-size: 20px; margin: 0; font-weight: 700; flex: 1; }
+/* top bar, like Tutor Desk's: the date small above the page's name */
+header { display: flex; align-items: center; gap: 10px; padding: 12px 16px 10px; position: sticky; top: 0; z-index: 5;
+  background: var(--bg); }
+header .titles { flex: 1; min-width: 0; }
+header .date { font-size: 11.5px; color: var(--muted); }
+header h1 { font: 600 22px/1.15 "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif; margin: 0;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .synced { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
-.synced .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); }
+.synced .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ok); }
 .synced.stale { color: var(--amber); } .synced.stale .dot { background: var(--amber); }
-.icon-btn { padding: 5px 9px; font-size: 16px; line-height: 1; }
-.tabs { display: flex; gap: 2px; padding: 0 16px; border-bottom: 1px solid var(--border); overflow-x: auto; }
-.tab { padding: 8px 11px; white-space: nowrap; flex: none; border: 1px solid transparent; border-bottom: none; border-radius: 6px 6px 0 0;
-  color: var(--muted); background: none; }
-.tab.on { color: var(--fg); background: var(--surface); border-color: var(--border); font-weight: 600;
-  margin-bottom: -1px; }
-main { padding: 10px 16px 24px; }
+.icon-btn { padding: 6px 9px; line-height: 0; background: transparent; border-color: transparent; }
+.icon-btn svg { width: 22px; height: 22px; }
+main { padding: 4px 16px 28px; }
+
+/* the sidebar, as a drawer: the same groups and pages as Tutor Desk's */
+.drawer-bg { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 20; opacity: 0; pointer-events: none;
+  transition: opacity .18s; }
+.drawer-bg.open { opacity: 1; pointer-events: auto; }
+.drawer { position: fixed; top: 0; bottom: 0; left: 0; width: min(280px, 82vw); background: var(--side); z-index: 21;
+  border-right: 1px solid var(--border); transform: translateX(-102%); transition: transform .2s ease-out;
+  overflow-y: auto; padding: calc(14px + env(safe-area-inset-top)) 10px calc(14px + env(safe-area-inset-bottom)); }
+.drawer.open { transform: none; }
+.brand { display: flex; align-items: center; gap: 10px; padding: 4px 12px 6px; font: 600 17px "Segoe UI Variable Display", "Segoe UI", sans-serif; }
+.brand svg { width: 24px; height: 24px; color: var(--accent); }
+.group { font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--dim); font-weight: 600; padding: 18px 12px 6px; }
+.nav { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; background: none; border: none;
+  border-radius: 9px; padding: 8px 12px; color: var(--soft); font-weight: 400; position: relative; }
+.nav svg { width: 18px; height: 18px; flex: none; color: var(--muted); }
+.nav.on { background: var(--hover); color: var(--fg); font-weight: 600; }
+.nav.on::before { content: ""; position: absolute; left: 0; top: 6px; bottom: 6px; width: 3px; border-radius: 2px; background: var(--accent); }
+.nav.on svg { color: var(--accent); }
+.nav .pc { margin-left: auto; font-size: 10px; color: var(--dim); font-weight: 600; letter-spacing: .08em; }
+.drawer .foot { font-size: 11.5px; color: var(--muted); padding: 18px 12px 0; }
+
+/* shared bits for the pages */
+.lab { font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.box { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 14px 16px; margin: 10px 0; }
+.box.hot { background: var(--tint); border-color: var(--tintline); } .box.hot > .lab { color: var(--accent); }
+.box > .lab { display: block; margin-bottom: 8px; }
+.box h2 { font: 600 17px/1.25 "Segoe UI Variable Display", "Segoe UI", sans-serif; margin: 0 0 4px; }
+.line { display: flex; align-items: baseline; gap: 8px; padding: 9px 0; border-top: 1px solid var(--border); }
+.line:first-of-type { border-top: none; }
+.line .grow { flex: 1; min-width: 0; }
+.line .sub { font-size: 12px; color: var(--muted); }
+.list > .line:first-child { border-top: none; }
+.tap { cursor: pointer; }
+.chip { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+ul.dots { margin: 4px 0; padding-left: 18px; } ul.dots li { margin: 3px 0; }
+.pcnote { font-size: 12px; color: var(--muted); border: 1px dashed var(--border); border-radius: 12px; padding: 10px 12px; margin: 10px 0; }
+.pick { width: 100%; margin: 4px 0 6px; }
+.empty { text-align: center; color: var(--muted); padding: 28px 8px; }
 
 /* calendar toolbar */
 .bar { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .bar .week { font-weight: 600; flex: 1; min-width: 120px; text-align: center; }
-.seg { display: inline-flex; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
-.seg button { border: none; border-radius: 0; background: var(--surface); padding: 6px 12px; }
-.seg button.on { background: var(--accent); color: #fff; }
+.seg { display: inline-flex; background: var(--field); border-radius: 10px; padding: 3px; gap: 2px; }
+.seg button { border: none; border-radius: 8px; background: none; padding: 5px 11px; color: var(--muted); font-size: 13px; }
+.seg button.on { background: var(--hover); color: var(--fg); box-shadow: inset 0 -2px 0 var(--accent); }
 .info { font-size: 12px; margin: 6px 0 8px; }
 .days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin: 8px 0; }
-.days button { padding: 5px 0; display: flex; flex-direction: column; align-items: center; gap: 1px; font-size: 12px; }
+.days button { padding: 5px 0; display: flex; flex-direction: column; align-items: center; gap: 1px; font-size: 12px;
+  font-weight: 400; background: var(--surface); }
 .days button b { font-size: 15px; }
 .days button.today { color: var(--accent); }
-.days button.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+.days button.on { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
 .days button .pip { width: 5px; height: 5px; border-radius: 50%; background: currentColor; opacity: .7; }
 .days button .pip.none { opacity: 0; }
 
@@ -107,10 +150,10 @@ main { padding: 10px 16px 24px; }
 .legend i { width: 14px; height: 10px; border: 1px solid; border-radius: 2px; display: inline-block; }
 
 /* hours tracker */
-select { font: inherit; color: var(--fg); background: var(--surface); border: 1px solid var(--border);
-  border-radius: 6px; padding: 6px 10px; }
+select { font: inherit; color: var(--fg); background: var(--field); border: 1px solid var(--border);
+  border-radius: 9px; padding: 7px 10px; }
 .cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 12px 0 10px; }
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 10px 12px; }
 .card b { display: block; font-size: 20px; line-height: 1.2; }
 .card span { font-size: 12px; color: var(--muted); }
 .progress { position: relative; height: 10px; border-radius: 5px; background: var(--surface);
@@ -133,25 +176,25 @@ select { font: inherit; color: var(--fg); background: var(--surface); border: 1p
 /* job applications */
 .seg.wide { display: flex; width: 100%; } .seg.wide button { flex: auto; padding: 7px 6px; font-size: 13px; }
 .filters { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 2px; }
-.filters button { font-size: 12px; padding: 4px 10px; border-radius: 14px; color: var(--muted); }
-.filters button.on { color: var(--fg); border-color: var(--accent); background: var(--field); }
+.filters button { font-size: 12px; padding: 4px 10px; border-radius: 14px; color: var(--muted); background: var(--surface); }
+.filters button.on { color: var(--fg); border-color: var(--tintline); background: var(--tint); }
 .filters button.on::before { content: "✓ "; color: var(--accent); }
-.job { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; margin: 6px 0; cursor: pointer; }
+.job { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 10px 12px; margin: 8px 0; cursor: pointer; }
 .job .top { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
 .job .t { font-weight: 600; flex-basis: 100%; margin-top: 3px; }
 .job .sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
 .job .no { font-size: 12px; color: var(--b-due-fg); margin-top: 2px; }
-.badge { font-size: 11px; font-weight: 600; padding: 1px 8px; border-radius: 3px; white-space: nowrap; }
-.b-new { background: var(--accent); color: #fff; }
-.b-sent { background: var(--surface); color: var(--fg); }
-.b-hid { background: var(--surface); color: var(--muted); }
+.badge { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 6px; white-space: nowrap; }
+.b-new { background: var(--accent); color: var(--accent-fg); }
+.b-sent { background: var(--hover); color: var(--fg); }
+.b-hid { background: var(--hover); color: var(--muted); }
 .reasons div { display: flex; gap: 6px; margin: 3px 0; }
 .reasons b { width: 14px; flex: none; text-align: center; }
 .sheet h3 { font-size: 14px; margin: 14px 0 4px; }
-.sheet .body { white-space: pre-wrap; font-size: 13px; background: var(--bg); border: 1px solid var(--border);
-  border-radius: 6px; padding: 8px; }
+.sheet .body { white-space: pre-wrap; font-size: 13px; background: var(--field); border: 1px solid var(--border);
+  border-radius: 10px; padding: 10px; }
 .sheet a.btn { display: block; text-align: center; text-decoration: none; margin-top: 12px; }
-.stat { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; margin: 8px 0; }
+.stat { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 12px 14px; margin: 8px 0; }
 .stat .row { display: flex; justify-content: space-between; align-items: baseline; }
 .stat .rate { font-size: 22px; font-weight: 700; color: var(--accent); }
 .stat .nums { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-top: 6px; text-align: center; }
@@ -160,7 +203,7 @@ select { font: inherit; color: var(--fg); background: var(--surface); border: 1p
 
 /* details sheet */
 .sheet-bg { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 10; display: flex; align-items: flex-end; }
-.sheet { background: var(--surface); border-top: 1px solid var(--border); width: 100%; border-radius: 12px 12px 0 0;
+.sheet { background: var(--surface); border-top: 1px solid var(--border); width: 100%; border-radius: 18px 18px 0 0;
   max-height: 88vh; overflow-y: auto; overscroll-behavior: contain;
   padding: 16px 16px calc(16px + env(safe-area-inset-bottom)); }
 .sheet h2 { font-size: 17px; margin: 6px 0 4px; }
@@ -170,12 +213,12 @@ select { font: inherit; color: var(--fg); background: var(--surface); border: 1p
 
 /* lock screen */
 .lock { max-width: 380px; width: calc(100% - 32px); margin: 12vh auto 0; padding: 24px 20px; background: var(--surface);
-  border: 1px solid var(--border); border-radius: 10px; text-align: center; }
+  border: 1px solid var(--border); border-radius: 16px; text-align: center; }
 .lock img { width: 64px; height: 64px; border-radius: 14px; }
 .lock h1 { font-size: 20px; margin: 8px 0 4px; }
 .lock input { width: 100%; margin: 14px 0 10px; padding: 10px; font: 600 17px/1 ui-monospace, Consolas, monospace;
   letter-spacing: 1px; text-align: center; background: var(--field); color: var(--fg); border: 1px solid var(--border);
-  border-radius: 6px; text-transform: uppercase; }
+  border-radius: 9px; text-transform: uppercase; }
 .lock input:focus { outline: 2px solid var(--accent); border-color: transparent; }
 .lock .err { color: var(--now); min-height: 1.3em; font-size: 13px; }
 .lock button { width: 100%; padding: 10px; }
@@ -195,12 +238,13 @@ select { font: inherit; color: var(--fg); background: var(--surface); border: 1p
 
 <div id="app" class="hidden">
   <header>
-    <h1>Tutor Desk</h1>
+    <button class="icon-btn" id="menu" aria-label="Pages"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+    <div class="titles"><div class="date" id="dateLine"></div><h1 id="pageTitle">Calendar</h1></div>
     <div class="synced" id="synced"><span class="dot"></span><span id="syncedText"></span></div>
-    <button class="icon-btn" id="reload" title="Check for a newer copy" aria-label="Check for a newer copy">↻</button>
+    <button class="icon-btn" id="reload" title="Check for a newer copy" aria-label="Check for a newer copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.3-5.6M20 4v4h-4"/></svg></button>
   </header>
-  <nav class="tabs"><button class="tab on" data-tab="cal">Calendar</button><button class="tab" data-tab="hours">Hours Tracker</button><button class="tab" data-tab="jobs">Job Applications</button></nav>
   <main>
+  <section id="otherTab" class="hidden"></section>
   <section id="calTab">
     <div class="bar">
       <button id="prev" aria-label="Previous">‹</button>
@@ -236,6 +280,8 @@ select { font: inherit; color: var(--fg); background: var(--surface); border: 1p
   </section>
   </main>
 </div>
+<div id="drawerBg" class="drawer-bg"></div>
+<nav id="drawer" class="drawer" aria-label="Pages"></nav>
 <div id="sheet" class="sheet-bg hidden"></div>
 
 <script>
@@ -342,17 +388,55 @@ function show(data) {
   showTab(tab);
 }
 
-// ---- tabs
-let tab = ["hours", "jobs"].includes(store.get("tab")) ? store.get("tab") : "cal";
+// ---- pages: the same groups and names as Tutor Desk's sidebar, in a drawer (☰)
+const ICON = {  // simple line icons, drawn in the text colour
+  home: "M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z",
+  cal: "M5 5h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2zM3 10h18M8 3v4M16 3v4",
+  lessons: "M4 4h4v16H4zM10 4h4v16h-4zM16.5 5.2l3.4-.9 3 14.6-3.4.9z",
+  progress: "M5 20V11M11 20V5M17 20v-6M3 20h18",
+  marking: "M4 20l4.5-1L19 8.5 15.5 5 5 15.5zM13.5 7l3.5 3.5",
+  reports: "M6 3h8l5 5v13H6zM14 3v5h5M9 13h7M9 17h7",
+  feedback: "M4 5h16v11H10l-6 4z",
+  resources: "M3 6h6l2 2h10v11H3z",
+  assistant: "M12 3l2 6 6 2-6 2-2 6-2-6-6-2 6-2z",
+  upload: "M12 16V4M7 9l5-5 5 5M4 20h16",
+  hours: "M12 3a9 9 0 1 1 0 18 9 9 0 0 1 0-18zM12 7v5l3 2",
+  live: "M5 7h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2zM9 7V5h6v2M3 12h18",
+  jobs: "M11 4a7 7 0 1 1 0 14 7 7 0 0 1 0-14zM20 20l-4-4",
+  audio: "M12 3a3 3 0 0 1 3 3v5a3 3 0 0 1-6 0V6a3 3 0 0 1 3-3zM5 11a7 7 0 0 0 14 0M12 18v3",
+};
+const svg = (d, w = 1.8) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"><path d="${d}"/></svg>`;
+const GROUPS = [
+  ["Today", [["home", "Home"], ["cal", "Calendar"], ["lessons", "Lessons"]]],
+  ["Students", [["progress", "Progress"], ["marking", "Marking"], ["reports", "Reports"]]],
+  ["Teaching", [["feedback", "Feedback"], ["resources", "Resources"], ["assistant", "Assistant"]]],
+  ["Admin", [["upload", "Upload Hours"], ["hours", "Hours Tracker"], ["live", "Live Jobs"], ["jobs", "Job Applications"], ["audio", "Audio"]]],
+];
+const NAMES = Object.fromEntries(GROUPS.flatMap(([, items]) => items));
+let tab = NAMES[store.get("tab")] ? store.get("tab") : "home";
+$("drawer").innerHTML = `<div class="brand">${svg("M2 9l10-5 10 5-10 5zM6 11v5c3 2 9 2 12 0v-5M22 9v5")}Tutor Desk</div>` +
+  GROUPS.map(([g, items]) => `<div class="group">${g}</div>` + items.map(([k, label]) =>
+    `<button class="nav" data-tab="${k}">${svg(ICON[k])}<span>${label}</span></button>`).join("")).join("") +
+  `<div class="foot">View only - a copy of Tutor Desk as of the last sync. Changes are made on the PC.</div>`;
+function drawer(open) { $("drawer").classList.toggle("open", open); $("drawerBg").classList.toggle("open", open); }
+$("menu").addEventListener("click", () => drawer(true));
+$("drawerBg").addEventListener("click", () => drawer(false));
+$("drawer").querySelectorAll(".nav").forEach((b) => b.addEventListener("click", () => { drawer(false); showTab(b.dataset.tab); }));
 function showTab(t) {
   tab = t; store.set("tab", t);
-  document.querySelectorAll(".tab").forEach((b) => b.classList.toggle("on", b.dataset.tab === t));
+  $("pageTitle").textContent = NAMES[t];
+  $("dateLine").textContent = fmt(new Date(), {weekday: "long", day: "numeric", month: "long"});
+  document.querySelectorAll(".nav").forEach((b) => b.classList.toggle("on", b.dataset.tab === t));
   $("calTab").classList.toggle("hidden", t !== "cal");
   $("hoursTab").classList.toggle("hidden", t !== "hours");
   $("jobsTab").classList.toggle("hidden", t !== "jobs");
+  $("otherTab").classList.toggle("hidden", ["cal", "hours", "jobs"].includes(t));
   if (!snap) return;
-  if (t === "cal") draw();
-  else { scrollTo(0, 0); t === "hours" ? drawHours() : drawJobs(); }
+  if (t === "cal") return draw();
+  scrollTo(0, 0);
+  if (t === "hours") drawHours();
+  else if (t === "jobs") drawJobs();
+  else drawOther(t);
 }
 
 // ---- Job Applications: Available (scored as in Tutor Desk), My applications and Stats - view only
@@ -461,10 +545,9 @@ function appSheet(a) {
     (a.pitch ? `<h3>Your experience (as drafted in Tutor Desk)</h3><div class="body">${esc(a.pitch)}</div>`
       : a.description ? `<h3>Description</h3><div class="body">${esc(a.description)}</div>` : "") + portalBtn(a.link));
 }
-document.querySelectorAll(".tab").forEach((b) => b.addEventListener("click", () => showTab(b.dataset.tab)));
 
 // ---- the Hours Tracker: same numbers, colours and graph as the tab in Tutor Desk
-const CELL = {red: "#c62828", orange: "#e08a00", green: "#2e7d32", current: "#616161"};
+const CELL = {red: "#c2413a", orange: "#d9821c", green: "#2f8f55", current: "#3a3a3e"};
 const LINE_COLOURS = ["#5b8def", "#f08c3a", "#9e9e9e", "#f2c230", "#a07be0", "#3fb2a8", "#e889b5"];
 let hYear = null, graphMode = store.get("graph") || "year";
 const hidden = new Set();
@@ -559,6 +642,408 @@ function drawGraph(years, cfg, current) {
     const y = +el.dataset.y; hidden.has(y) ? hidden.delete(y) : hidden.add(y); drawHours();
   }));
 }
+// ---- the other pages (22 Nov 2026): view-only copies of Tutor Desk's tabs; anything that changes things, or
+// needs the PC's AI, the portal or the files themselves, stays on the PC
+const CHIP = {good: "sub", amber: "draft", red: "due", grey: "ns", pink: "hol", acc: "acc", skip: "skip"};
+const chip = (text, kind = "grey") => `<span class="chip" style="background:var(--b-${CHIP[kind] || kind});color:var(--b-${CHIP[kind] || kind}-fg)">${esc(text)}</span>`;
+const day = (s, o = {weekday: "short", day: "numeric", month: "short"}) => s ? fmt(parseIso(s), o) : "";
+const g = (n) => n == null ? "" : String(Math.round(n * 10) / 10);
+const pcNote = (text) => `<div class="pcnote">${text}</div>`;
+const list = (items) => items && items.length ? `<ul class="dots">${items.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>` : "";
+const box = (label, body, hot) => `<div class="box ${hot ? "hot" : ""}">${label ? `<span class="lab">${esc(label)}</span>` : ""}${body}</div>`;
+const empty = (text) => `<div class="empty">${esc(text)}</div>`;
+const scoreKind = (v) => v == null ? "grey" : v >= 7 ? "good" : v >= 5 ? "amber" : "red";
+function missing(d, what) {
+  if (!d) return empty(`${what} isn't in this copy yet - Sync everything in Tutor Desk to send it.`);
+  if (d.error) return empty(`${what} couldn't be copied on the last sync (${d.error}).`);
+  return "";
+}
+function picker(key, names, all, def) {  // a student (or other) picker, remembered on this phone
+  const saved = store.get("pick_" + key);
+  const chosen = names.includes(saved) || (all && saved === all) ? saved : (all || def || names[0] || "");
+  const opts = (all ? [all] : []).concat(names);
+  return {chosen, html: `<select class="pick" data-pick="${key}">${opts.map((n) => `<option ${n === chosen ? "selected" : ""}>${esc(n)}</option>`).join("")}</select>`};
+}
+function wire(el) {
+  el.querySelectorAll("[data-pick]").forEach((s) => s.addEventListener("change", () => { store.set("pick_" + s.dataset.pick, s.value); drawOther(tab); }));
+  el.querySelectorAll("[data-seg]").forEach((b) => b.addEventListener("click", () => { store.set("seg_" + b.dataset.seg, b.dataset.v); drawOther(tab); }));
+}
+const seg = (key, options, def) => {
+  const cur = options.some(([v]) => v === store.get("seg_" + key)) ? store.get("seg_" + key) : def;
+  return {cur, html: `<div class="seg" style="margin:4px 0 6px">${options.map(([v, label]) => `<button data-seg="${key}" data-v="${v}" class="${v === cur ? "on" : ""}">${label}</button>`).join("")}</div>`};
+};
+// a summary or draft as text: capital-letter lines are headings, "Student:"-style lines small, "- " lines bullets
+function prose(text) {
+  if (!text) return "";
+  let out = "", inList = false;
+  for (const raw of text.split(/\r?\n/)) {
+    const line = raw.trim();
+    const bullet = /^[-•*]\s+/.test(line);
+    if (inList && !bullet) { out += "</ul>"; inList = false; }
+    if (!line) continue;
+    if (bullet) { if (!inList) { out += `<ul class="dots">`; inList = true; } out += `<li>${esc(line.replace(/^[-•*]\s+/, ""))}</li>`; }
+    else if (/^[A-Z][A-Z0-9 &/,'()-]{3,}:?$/.test(line) || /^#+\s/.test(line)) out += `<h3>${esc(line.replace(/^#+\s*/, ""))}</h3>`;
+    else if (/^(Student|Date|Topic|Length):/.test(line)) out += `<div class="muted" style="font-size:12px">${esc(line)}</div>`;
+    else out += `<p>${esc(line)}</p>`;
+  }
+  return out + (inList ? "</ul>" : "");
+}
+function tapRows(el, sel, fn) { el.querySelectorAll(sel).forEach((r) => r.addEventListener("click", () => fn(r.dataset))); }
+
+function drawOther(t) {
+  const el = $("otherTab");
+  const page = {home: pageHome, lessons: pageLessons, progress: pageProgress, marking: pageMarking, reports: pageReports,
+    feedback: pageFeedback, resources: pageResources, assistant: pageAssistant, upload: pageUpload, live: pageLive, audio: pageAudio}[t];
+  el.innerHTML = page ? page(el) : "";
+  wire(el);
+  if (page && page.after) page.after(el);
+}
+
+// Home: the briefing for the next lesson, then the other widgets
+function untilText(start) {
+  const m = Math.round((new Date(start) - Date.now()) / 60000);
+  if (m < -5) return "started";
+  if (m <= 0) return "now";
+  return m < 60 ? `in ${m} min` : m < 1440 ? `in ${Math.floor(m / 60)} h ${m % 60} min` : `in ${Math.round(m / 1440)} days`;
+}
+function whenText(start) {
+  const d = new Date(start), today = iso(new Date()), tmr = iso(addDays(new Date(), 1));
+  const dayPart = iso(d) === today ? "Today" : iso(d) === tmr ? "Tomorrow" : fmt(d, {weekday: "short", day: "numeric", month: "short"});
+  return `${dayPart}, ${hhmm(d.getHours() * 60 + d.getMinutes())}`;
+}
+const BRIEF_STATE = {first: "First lesson with this student - nothing to brief from yet.",
+  no_summary: "The last lesson has no summary yet, so there's no brief.", busy: "The brief will be written once the recorder has finished.",
+  waiting: "The brief hasn't been written yet - Tutor Desk writes it on the PC."};
+function briefBody(b) {
+  const parts = [["Covered last time", b.covered], ["Found hard", b.hard], ["Homework", b.homework], ["Suggested for today", b.today]];
+  return (b.last_day ? `<div class="muted" style="font-size:12px;margin:2px 0 6px">Last lesson ${day(b.last_day)}${b.last_topic ? " · " + esc(b.last_topic) : ""}</div>` : "") +
+    (b.state === "ready" ? "" : `<p class="muted">${BRIEF_STATE[b.state] || ""}</p>`) +
+    parts.filter(([, v]) => v && v.length).map(([h, v]) => `<h3 style="font-size:13px;margin:10px 0 2px">${h}</h3>${list(v)}`).join("") +
+    (b.boards && b.boards.length ? `<div class="muted" style="font-size:12px;margin-top:8px">Whiteboard${b.boards.length > 1 ? "s" : ""}: ${esc(b.boards.map((x) => x.label || "board").join(", "))} (links open on the PC)</div>` : "") +
+    (b.starter_made ? `<div style="margin-top:8px">${chip("Starter made", "good")}</div>` : "");
+}
+function pageHome() {
+  const H = snap.home, miss = missing(H, "Home");
+  if (miss) return miss;
+  let h = "";
+  const briefs = (H.briefs || []).filter((b) => new Date(b.end) > Date.now());
+  if (briefs.length) {
+    const b = briefs[0];
+    h += box("Next lesson briefing", `<h2>${esc(b.student)}</h2><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:4px">` +
+      `<b>${whenText(b.start)}</b>${chip(untilText(b.start), "acc")}${b.provisional ? chip("Provisional", "grey") : ""}</div>` + briefBody(b), true);
+    if (briefs.length > 1) h += box("Coming up", `<div class="list">${briefs.slice(1).map((x, i) => `<div class="line tap" data-i="${i + 1}"><span class="grow">${esc(x.student)}` +
+      `<div class="sub">${esc(x.last_topic ? "Last: " + x.last_topic : "First lesson")}</div></span><span class="muted" style="font-size:12px">${whenText(x.start)}</span></div>`).join("")}</div>`);
+  } else if (H.briefs_error) h += box("Next lesson briefing", `<p class="muted">Couldn't copy the briefing (${esc(H.briefs_error)}).</p>`, true);
+  else h += box("Next lesson briefing", `<p class="muted">No lessons coming up in the calendar.</p>`, true);
+
+  const A = H.job_alerts;
+  if (A) h += box("New job alerts", A.items.length ? `<div class="list">${A.items.map((j) => `<div class="line tap" data-job="${esc(j.id)}"><span class="grow">${esc(j.title)}` +
+    `<div class="sub">${[j.hours_per_week ? g(j.hours_per_week) + " h/week" : "", j.first_seen ? "seen " + ago(j.first_seen) : ""].filter(Boolean).join(" · ")}</div></span>` +
+    `${j.juicy ? chip("Juicy", "acc") : ""}${j.new ? chip("NEW", "good") : ""}</div>`).join("")}</div>${A.more ? `<div class="muted" style="font-size:12px">+ ${A.more} more in Job Applications</div>` : ""}`
+    : `<p class="muted">No new good matches in the last 7 days.</p>`);
+  const U = H.hours;
+  if (U) h += box("Hours to upload", !U.checked ? `<p class="muted">Pending lessons haven't been read from the portal yet.</p>`
+    : U.count ? `<div class="list">${U.items.map((x) => `<div class="line"><span class="grow">${esc(x.student)}<div class="sub">${day(x.day)} · ${x.start}</div></span>` +
+      `${x.ready ? chip("Transcript ready", "good") : chip("No transcript yet", "amber")}</div>`).join("")}</div>${U.count > U.items.length ? `<div class="muted" style="font-size:12px">+ ${U.count - U.items.length} more</div>` : ""}`
+      + `<div class="muted" style="font-size:12px;margin-top:6px">Read ${ago(U.refreshed)} · submit on the PC</div>`
+    : `<p class="muted">Nothing waiting to upload (read ${ago(U.refreshed)}).</p>`);
+  const R = H.reports;
+  if (R) {
+    const todo = R.outstanding.length;
+    h += box(`Reports · ${R.month_name}`, `<p>${R.submitted} submitted · ${R.drafts} draft${R.drafts === 1 ? "" : "s"} · ${todo - R.drafts} not started</p>` +
+      `<div class="muted" style="font-size:12px">${R.in_window ? "Due now" : "Due from " + day(R.due_from, {weekday: "long", day: "numeric", month: "long"})}</div>` +
+      (todo ? `<div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:8px">${R.outstanding.map((o) => chip(o.student + (o.draft ? " · draft" : ""), o.draft ? "amber" : R.in_window ? "red" : "grey")).join("")}</div>` : ""));
+  }
+  const S = H.scores;
+  if (S && S.count) h += box(`Scores to check (${S.count})`, `<div class="list">${S.items.map((x) => `<div class="line"><span class="grow">${esc(x.student)} · ${esc(x.topic)}` +
+    `<div class="sub">${day(x.day)} · ${esc(x.raw || g(x.score) + "/10")}${x.confidence != null ? ` · ${x.confidence}% sure` : ""}</div>` +
+    x.said.map((q) => `<div class="sub" style="font-style:italic">“${esc(q)}”</div>`).join("") + `</span></div>`).join("")}</div>` +
+    `<div class="muted" style="font-size:12px">Keep or remove them in Tutor Desk.</div>`);
+  if (H.welcome && H.welcome.length) h += box("Welcome emails to send", `<div class="list">${H.welcome.map((w) => `<div class="line"><span class="grow">${esc(w.student)}<div class="sub">${esc(w.job)}</div></span></div>`).join("")}</div>`);
+  if (H.assess && H.assess.count) h += box(`Initial assessments (${H.assess.count})`, `<div class="list">${H.assess.items.map((a) => `<div class="line"><span class="grow">${esc(a.student)}<div class="sub">${esc(a.course || "")}</div></span></div>`).join("")}</div>`);
+  pageHome.after = (el) => {
+    tapRows(el, "[data-i]", (d) => { const b = briefs[+d.i]; openSheet(`<div class="muted">${whenText(b.start)}</div><h2>${esc(b.student)}</h2>${briefBody(b)}`); });
+    tapRows(el, "[data-job]", (d) => { const j = (snap.jobs && snap.jobs.available || []).find((x) => x.id === d.job); if (j) jobSheet(j); });
+  };
+  return h;
+}
+
+// Lessons: each student's lesson summaries from the last few weeks (transcripts and the chat stay on the PC)
+function pageLessons() {
+  const L = snap.lessons, miss = missing(L, "Lessons");
+  if (miss) return miss;
+  const students = [...L.students].sort((a, b) => b.last.localeCompare(a.last));
+  if (!students.length) return empty("No lessons in the last few weeks.");
+  const p = picker("lessons", students.map((s) => s.name));
+  const s = students.find((x) => x.name === p.chosen);
+  pageLessons.after = (el) => tapRows(el, "[data-i]", (d) => {
+    const l = s.lessons[+d.i];
+    openSheet(`<div class="muted">${day(l.date, {weekday: "long", day: "numeric", month: "long"})} · ${g(l.hours)} h</div><h2>${esc(s.name)} · ${esc(l.topic)}</h2>` +
+      (l.summary ? `<div style="font-size:13.5px">${prose(l.summary)}</div>` : `<p class="muted">${l.no_transcript ? "No transcript was recorded for this lesson." : "No summary yet - Tutor Desk makes it on the PC."}</p>`));
+  });
+  return p.html + `<div class="muted info">Summaries from the last ${L.weeks} weeks · ${s.total} lesson${s.total === 1 ? "" : "s"} in all</div>` +
+    `<div class="box"><div class="list">${s.lessons.map((l, i) => `<div class="line tap" data-i="${i}"><span class="grow">${esc(l.topic)}<div class="sub">${day(l.date)} · ${g(l.hours)} h</div></span>` +
+      (l.no_transcript ? chip("No transcript", "grey") : !l.summary ? chip("No summary", "amber") : "") + `</div>`).join("")}</div></div>` +
+    pcNote("Transcripts and the Ask chat are on the PC (Lessons tab).");
+}
+
+// Progress: a student's topics with their statuses and scores
+const STATUS_COL = {Learning: "var(--warn)", Secure: "var(--ok)", "Exam-ready": "#26c6da"};
+const statusDot = (st) => `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${STATUS_COL[st] || "var(--dim)"};margin-right:6px"></span>`;
+function pageProgress() {
+  const P = snap.progress, miss = missing(P, "Progress");
+  if (miss) return miss;
+  const people = P.students.filter((s) => s.lists.length || s.tests.length);
+  if (!people.length) return empty("No Progress lists yet.");
+  const busiest = [...people].sort((a, b) => b.lists.reduce((t, l) => t + l.counts.covered, 0) - a.lists.reduce((t, l) => t + l.counts.covered, 0))[0];
+  const p = picker("progress", people.map((s) => s.name), null, busiest.name);
+  const s = people.find((x) => x.name === p.chosen);
+  let h = p.html;
+  const lp = s.lists.length > 1 ? picker("progress_list_" + s.name, s.lists.map((l) => l.name)) : {chosen: s.lists[0] && s.lists[0].name, html: ""};
+  h += lp.html;
+  const ls = s.lists.find((l) => l.name === lp.chosen);
+  const topics = [];
+  if (ls) {
+    const c = ls.counts;
+    h += `<div class="info muted">Covered ${c.covered} of ${c.topics} · <span style="color:#26c6da">${c.exam_ready} exam-ready</span> · <span style="color:var(--ok)">${c.secure} secure</span>` +
+      (c.review_due ? ` · ↻ ${c.review_due} due for review` : "") + (c.weak ? ` · ${c.weak} needing work` : "") + (c.hard ? ` · ⚠ ${c.hard} still hard` : "") + `</div>`;
+    for (const gr of ls.groups) {
+      const started = gr.topics.filter((t) => (t.stages && t.stages.length) || t.covered).length;
+      h += `<div class="box">${gr.name ? `<span class="lab">${esc(gr.name)} <span style="letter-spacing:0;text-transform:none;font-weight:400">· ${started} of ${gr.topics.length} started</span></span>` : ""}<div class="list">` +
+        gr.topics.map((t) => {
+          topics.push(t);
+          const scores = (t.stages || []).slice(-3).map((x) => chip(g(x.score), scoreKind(x.score))).join(" ");
+          return `<div class="line tap" data-i="${topics.length - 1}"><span class="grow">${statusDot(t.status)}${esc(t.topic)}` +
+            `${t.hard_now ? ` <span style="color:var(--warn)">⚠</span>` : ""}${t.review_due ? ` <span style="color:var(--accent)">↻</span>` : ""}` +
+            `<div class="sub" style="margin-left:14px">${esc(t.status)}${t.covered ? ` · covered ${t.covered}×` : ""}${t.initial != null ? ` · initial ${t.initial}` : ""}</div></span>${scores}</div>`;
+        }).join("") + `</div></div>`;
+    }
+  }
+  if (s.tests.length) h += box("Test results", `<div class="list">${s.tests.map((t) => `<div class="line"><span class="grow">${esc(t.what || t.subject)}<div class="sub">${day(t.day)}${t.subject && t.what ? " · " + esc(t.subject) : ""}</div></span><b>${esc(t.raw)}</b></div>`).join("")}</div>`);
+  if (s.reviews.length) h += box("Due for review", list(s.reviews));
+  h += pcNote("Scores are added and changed in Tutor Desk (Progress tab).");
+  pageProgress.after = (el) => tapRows(el, "[data-i]", (d) => {
+    const t = topics[+d.i];
+    const stages = (t.stages || []).map((x, i) => `<div class="line"><span class="grow">Stage ${i + 1}${x.type ? " · " + esc(x.type) : ""}<div class="sub">${day(x.day)}${x.source ? " · " + esc(x.source) : ""}${x.skill ? " · " + esc(x.skill) : ""}</div>${x.what ? `<div class="sub">${esc(x.what)}</div>` : ""}</span>${chip(g(x.score) + "/10", scoreKind(x.score))}</div>`).join("");
+    const skills = (t.skills || []).map((k) => `<div class="line"><span class="grow">${statusDot(k.status)}${esc(k.code)} ${esc(k.skill)}<div class="sub" style="margin-left:14px">${esc(k.status)}${k.review_due ? " · ↻ due" : ""}</div></span>${(k.stages || []).slice(-2).map((x) => chip(g(x.score), scoreKind(x.score))).join(" ")}</div>`).join("");
+    openSheet(`<div class="muted">${esc(lp.chosen || "")}</div><h2>${esc(t.topic)}</h2><div>${statusDot(t.status)}<b>${esc(t.status)}</b>${t.was && t.was !== t.status ? ` <span class="muted">(was ${esc(t.was)})</span>` : ""}</div>` +
+      (t.text ? `<p class="muted">${esc(t.text)}</p>` : "") +
+      `<p class="muted" style="font-size:12px">${t.initial != null ? `Initial rating ${t.initial}/10 · ` : ""}${t.covered ? `covered in ${t.covered} lesson${t.covered === 1 ? "" : "s"}, last ${day(t.last_covered)}` : "not covered in a lesson yet"}${t.hard_now ? " · ⚠ still hard" : ""}${t.notes ? ` · ${t.notes} note${t.notes === 1 ? "" : "s"}` : ""}</p>` +
+      (stages ? `<h3>Scores</h3><div class="list">${stages}</div>` : "") + (skills ? `<h3>Skills</h3><div class="list">${skills}</div>` : ""));
+  });
+  return h;
+}
+
+// Marking: what's been marked, and each marking as saved
+function pageMarking() {
+  const M = snap.marking, miss = missing(M, "Marking");
+  if (miss) return miss;
+  const names = [...new Set(M.markings.map((m) => m.student))].sort();
+  const p = picker("marking", names, "All students");
+  const rows = M.markings.filter((m) => p.chosen === "All students" || m.student === p.chosen);
+  pageMarking.after = (el) => tapRows(el, "[data-id]", (d) => {
+    const m = M.markings.find((x) => x.id === d.id);
+    const sec = (h, items) => items && items.length ? `<h3>${h}</h3>${list(items)}` : "";
+    openSheet(`<div class="muted">${day(m.day, {weekday: "long", day: "numeric", month: "long"})}${m.course ? " · " + esc(m.course) : ""}</div><h2>${esc(m.student)}</h2>` +
+      `<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">${m.available ? chip(`${m.awarded}/${m.available}`, m.kind) : ""}<span class="muted">${esc(m.topic)}</span>${m.sheet ? chip(m.sheet, "acc") : ""}</div>` +
+      (m.test ? `<p>${chip("Formal assessment", "acc")} ${esc(m.test.name)}${m.test.day ? ", sat " + day(m.test.day) : ""}</p>` : "") +
+      (m.homework ? `<p class="muted" style="font-size:12px">Homework set ${day(m.homework.set_day)}: ${esc(m.homework.task)} · ${esc(m.homework.label)}</p>` : "") +
+      (m.summary ? `<h3>Summary</h3><p>${esc(m.summary)}</p>` : "") + sec("Went well", m.went_well) + sec("To work on", m.to_work_on) + sec("Misconceptions", m.misconceptions) +
+      (m.topic_scores.length ? `<h3>Progress scores</h3>${m.topic_scores.map(([t, v]) => `<div class="line"><span class="grow">${esc(t)}</span>${chip(g(+v) + "/10", scoreKind(+v))}</div>`).join("")}` : "") +
+      (m.questions ? `<h3>Question by question</h3><div class="body">${esc(m.questions)}</div>` : "") +
+      (m.unclear ? `<p class="muted" style="font-size:12px">Note from Claude: ${esc(m.unclear)}</p>` : "") +
+      (m.confidence ? `<p class="muted" style="font-size:12px">Claude's confidence: ${esc(m.confidence)}</p>` : ""));
+  });
+  return p.html + (rows.length ? `<div class="box"><span class="lab">Marked before</span><div class="list">${rows.map((m) => `<div class="line tap" data-id="${esc(m.id)}"><span class="grow">${day(m.day)} · ${esc(m.student)}` +
+    `<div class="sub">${esc(m.topic || "—")}</div></span>${m.available ? chip(`${m.awarded}/${m.available}`, m.kind) : `<span class="muted">—</span>`}</div>`).join("")}</div></div>` : empty("Nothing marked yet.")) +
+    (M.total > M.markings.length ? `<div class="muted info">The newest ${M.markings.length} of ${M.total}.</div>` : "") +
+    pcNote("Marking with Claude needs the PC: add the work and mark scheme in the Marking tab there.");
+}
+
+// Reports: this month's and last month's table, with each draft to read
+const REPORT_CHIP = {"Not started": "grey", Due: "red", Draft: "amber", Submitted: "good", Skipped: "skip", "No lessons in this period": "skip"};
+function pageReports() {
+  const R = snap.reports, miss = missing(R, "Reports");
+  if (miss) return miss;
+  const sg = seg("reports", R.months.map((m) => [m.month, m.label]), R.default);
+  const m = R.months.find((x) => x.month === sg.cur) || R.months[0];
+  const c = {};
+  m.rows.forEach((r) => { c[r.status] = (c[r.status] || 0) + 1; });
+  pageReports.after = (el) => tapRows(el, "[data-i]", (d) => {
+    const r = m.rows[+d.i];
+    openSheet(`<div class="muted">${esc(m.label)}</div><h2>${esc(r.student)}</h2>${chip(r.status, REPORT_CHIP[r.status])}` +
+      `<p class="muted" style="font-size:12px">${r.lessons} lesson${r.lessons === 1 ? "" : "s"}${r.from ? ` · covers ${day(r.from)} – ${day(r.to)}` : ""}${r.last_covered ? ` · last report covered to ${day(r.last_covered)}` : ""} · summaries ${r.summaries_ready}/${r.lessons}</p>` +
+      (r.draft ? `<h3>Draft written ${r.draft.generated ? ago(r.draft.generated) : ""}</h3>${r.draft.stale ? `<p style="color:var(--warn);font-size:12px">Newer lessons since - rewrite it in Tutor Desk.</p>` : ""}` +
+        (r.draft.text ? `<div style="font-size:13.5px">${prose(r.draft.text)}</div>` : `<p class="muted">The draft file couldn't be read.</p>`) : ""));
+  });
+  return sg.html + `<div class="info muted">${Object.entries(c).map(([k, n]) => `${n} ${k.toLowerCase()}`).join(" · ")}${R.active_known ? "" : " · Active Jobs not read yet"}</div>` +
+    `<div class="box"><div class="list">${m.rows.map((r, i) => {
+      const notes = [r.draft ? `draft ${r.draft.stale ? "(newer lessons since)" : "written"}` : "", r.portal_ref ? `submitted ${r.portal_ref}` : "",
+        r.newer ? `${r.newer} newer → next month` : "", r.lessons ? "" : "no lessons in this period"].filter(Boolean);
+      return `<div class="line tap" data-i="${i}"><span class="grow">${esc(r.student)}<div class="sub">${r.lessons} lesson${r.lessons === 1 ? "" : "s"}${r.from ? ` · ${day(r.from)} – ${day(r.to)}` : ""}</div>` +
+        (notes.length ? `<div class="sub">${esc(notes.join(" · "))}</div>` : "") + `</span>${chip(r.status, REPORT_CHIP[r.status])}</div>`;
+    }).join("")}</div></div>` + pcNote("Reports are written, skipped and uploaded in Tutor Desk.");
+}
+
+// Feedback: per lesson, weekly or monthly, for all students or one
+const MEASURES = [["talk_share", "Your talk share", "%", -1], ["tutor_questions_per_hour", "Questions an hour", "", 1], ["open_pct", "Open questions", "%", 1],
+  ["student_questions_per_hour", "Student questions an hour", "", 1], ["checks_per_hour", "Understanding checks an hour", "", 1],
+  ["student_turn_words", "Student answer length", " words", 1], ["longest_talk_min", "Longest talk", " min", -1]];
+function tiles(m, before) {
+  return `<div class="cards">${MEASURES.map(([k, label, unit, better]) => {
+    let diff = "";
+    if (before && before[k] != null && m[k] != null) {
+      const dv = Math.round((m[k] - before[k]) * 10) / 10;
+      if (dv) diff = ` <small style="color:${dv * better > 0 ? "var(--ok)" : "var(--warn)"}">${dv > 0 ? "▲" : "▼"} ${g(Math.abs(dv))}</small>`;
+    }
+    return `<div class="card"><b>${g(m[k])}${unit}${diff}</b><span>${label}</span></div>`;
+  }).join("")}</div>`;
+}
+const obs = (title, items) => items && items.length ? `<h3>${title}</h3>${items.map((o) => `<div style="margin:6px 0"><b>${esc(o.item)}</b>${o.time ? ` <span class="muted" style="font-size:12px">at ${esc(o.time)}</span>` : ""}` +
+  (o.quote ? `<div class="muted" style="font-style:italic;font-size:13px">“${esc(o.quote)}”</div>` : "") + (o.note ? `<div style="font-size:13px">${esc(o.note)}</div>` : "") + `</div>`).join("")}` : "";
+function pageFeedback() {
+  const F = snap.feedback, miss = missing(F, "Feedback");
+  if (miss) return miss;
+  const sg = seg("feedback", [["lesson", "Per lesson"], ["weekly", "Weekly"], ["monthly", "Monthly"]], "lesson");
+  const names = [...new Set(F.lessons.map((l) => l.student).concat((F.periods.weekly || []).map((r) => r.student)))].filter((n) => n && n !== "All students").sort();
+  const p = picker("feedback", names, "All students");
+  const all = p.chosen === "All students";
+  let h = `<div class="bar">${sg.html}</div>` + p.html;
+  if (sg.cur === "lesson") {
+    const rows = F.lessons.filter((l) => all || l.student === p.chosen);
+    let lastWeek = "";
+    h += rows.length ? rows.map((l, i) => {
+      const wk = iso(monday(parseIso(l.day)));
+      const head = wk !== lastWeek ? `<div class="lab" style="margin:16px 0 4px">Week of ${day(wk, {day: "numeric", month: "short"})}</div>` : "";
+      lastWeek = wk;
+      const ts = l.measures.talk_share;
+      return head + `<div class="job" data-i="${F.lessons.indexOf(l)}"><div style="display:flex;justify-content:space-between;gap:8px"><b>${esc(l.student)}</b><span class="muted" style="font-size:12px">${day(l.day)}</span></div>` +
+        `<div class="sub">${esc(l.topic)}</div><div style="display:flex;align-items:center;gap:8px;margin-top:6px"><div class="progress" style="flex:1;margin:0"><i style="width:${ts}%;background:${ts > 70 ? "var(--warn)" : "var(--accent)"}"></i></div>` +
+        `<span style="font-size:12px" class="muted">you ${ts}%</span></div></div>`;
+    }).join("") : empty("No feedback for these lessons.");
+    pageFeedback.after = (el) => tapRows(el, "[data-i]", (d) => {
+      const l = F.lessons[+d.i];
+      openSheet(`<div class="muted">${day(l.day, {weekday: "long", day: "numeric", month: "long"})} · ${l.measures.minutes} min</div><h2>${esc(l.student)} · ${esc(l.topic)}</h2>` +
+        tiles(l.measures) + obs("Strengths", l.strengths) + obs("Try next time", l.tries) + obs("Other observations", l.other));
+    });
+  } else {
+    const who = all ? "All students" : p.chosen;
+    const rows = (F.periods[sg.cur] || []).filter((r) => r.student === who);
+    h += rows.length ? rows.map((r, i) => {
+      const label = sg.cur === "weekly" ? `Week of ${day(r.start, {day: "numeric", month: "short", year: "numeric"})}` : day(r.start, {month: "long", year: "numeric"});
+      const tally = Object.entries(r.tally).map(([k, [tries, goods]]) => `<div class="line"><span class="grow">${esc(k)}</span><span style="color:var(--ok)">${goods} ✓</span><span style="color:var(--warn);margin-left:8px">${tries} to try</span></div>`).join("");
+      return `<div class="box"><span class="lab">${label} · ${r.lessons} lesson${r.lessons === 1 ? "" : "s"}</span>${tiles(r.measures, rows[i + 1] && rows[i + 1].measures)}` +
+        (r.try ? `<p><b>One thing to try:</b> ${esc(r.try)} <span class="muted">(${r.try_count} lesson${r.try_count === 1 ? "" : "s"})</span></p>` : "") +
+        (tally ? `<details><summary class="muted" style="font-size:12px">Checklist</summary><div class="list">${tally}</div></details>` : "") + `</div>`;
+    }).join("") : empty("Nothing for this choice yet.");
+    pageFeedback.after = null;
+  }
+  return h + `<div class="muted info">Feedback runs from ${day(F.since, {day: "numeric", month: "long", year: "numeric"})} · ${F.total} lessons in all · lessons from the last 8 weeks here.</div>`;
+}
+
+// Resources: the sheets, and where a student is up to (the PDFs are on the PC)
+const RES_STATUS = {"Exam-ready": "#26c6da", Secure: "var(--ok)", Learning: "var(--warn)"};
+function pageResources() {
+  const R = snap.resources, miss = missing(R, "Resources");
+  if (miss) return miss;
+  const names = Object.keys(R.students || {}).sort();
+  const p = picker("resources", names, "All sheets");
+  const st = R.students[p.chosen];
+  let h = p.html + (st ? `<div class="info muted">Board: ${esc(st.board || "not set")}</div>` : "");
+  for (const se of R.series) {
+    const mine = st && st.series[se.code || se.series];
+    h += `<div class="box"><span class="lab">${esc(se.subject)} · ${esc(se.level)}</span><h2>${esc(se.series)} <span class="muted" style="font-size:13px">${esc(se.code)}</span></h2>` +
+      `<div style="display:flex;gap:5px;flex-wrap:wrap;margin:4px 0">${se.cheat_sheet ? chip("Cheat sheet", "grey") : ""}${se.topic_test ? chip("Topic test", "grey") : ""}${chip(se.sheets.length + " sheets", "grey")}</div>` +
+      (mine && mine.summary ? `<div class="muted" style="font-size:12px;margin-bottom:4px">${esc(mine.summary)}</div>` : "") +
+      `<div class="list">${se.sheets.map((s) => {
+        const [status, due] = (mine && mine.status[s.code]) || [];
+        const next = mine && mine.next === s.code;
+        return `<div class="line" style="${next ? "background:var(--tint);margin:0 -8px;padding:9px 8px;border-radius:8px" : ""}"><span style="font-weight:600;width:54px;flex:none">${esc(s.code)}</span>` +
+          `<span class="grow">${esc(s.skill)}<div class="sub">${esc(s.boards || "")}${s.exit ? " · exit question" : ""}</div></span>` +
+          (status ? `<span style="font-size:12px;color:${RES_STATUS[status] || "var(--muted)"}">${esc(status)}${due ? " ↻" : ""}</span>` : "") + (next ? `<span style="color:var(--accent);font-size:12px;font-weight:600">◀ next</span>` : "") + `</div>`;
+      }).join("")}</div></div>`;
+  }
+  return h + pcNote("Opening, printing and dragging the PDFs, Notes and Dictate are on the PC (Resources tab).");
+}
+
+// Assistant: past chats to read back
+function pageAssistant() {
+  const A = snap.assistant, miss = missing(A, "Assistant");
+  if (miss) return miss;
+  pageAssistant.after = (el) => tapRows(el, "[data-i]", (d) => {
+    const c = A.chats[+d.i];
+    openSheet(`<div class="muted">${fmt(new Date(c.created), {weekday: "short", day: "numeric", month: "short"})}${c.students.length ? " · " + esc(c.students.join(", ")) : ""}</div><h2>${esc(c.title)}</h2>` +
+      (c.earlier ? `<p class="muted" style="font-size:12px">${c.earlier} earlier message${c.earlier === 1 ? "" : "s"} not shown.</p>` : "") +
+      c.messages.map((m) => `<div style="margin:10px 0;${m.role === "user" ? "margin-left:28px;background:var(--tint);border:1px solid var(--tintline)" : "margin-right:12px;background:var(--field);border:1px solid var(--border)"};border-radius:12px;padding:8px 11px">` +
+        `<div class="muted" style="font-size:11px">${m.role === "user" ? "You" : "Claude"} · ${esc((m.time || "").slice(11, 16))}</div>` +
+        `<div style="white-space:pre-wrap;font-size:13.5px${m.error ? ";color:var(--now)" : ""}">${esc(m.text)}</div>` +
+        (m.files.length ? `<div style="margin-top:6px;display:flex;gap:5px;flex-wrap:wrap">${m.files.map((f) => chip("PDF " + f, "acc")).join("")}</div>` : "") + `</div>`).join(""));
+  });
+  return (A.chats.length ? `<div class="box"><span class="lab">Chats</span><div class="list">${A.chats.map((c, i) => `<div class="line tap" data-i="${i}"><span class="grow">${esc(c.title)}` +
+    `<div class="sub">${ago(c.last)}${c.students.length ? " · " + esc(c.students.join(", ")) : ""}${c.pdfs ? ` · ${c.pdfs} PDF${c.pdfs === 1 ? "" : "s"}` : ""}</div></span></div>`).join("")}</div></div>` : empty("No chats yet.")) +
+    pcNote("New chats run on the PC with your Claude plan; the PDFs are in the Zoom folder there.");
+}
+
+// Upload Hours: what's waiting, as last read
+function pageUpload() {
+  const U = snap.upload, miss = missing(U, "Upload Hours");
+  if (miss) return miss;
+  if (!U.checked) return empty("Pending lessons haven't been read from the portal yet - Refresh pending lessons in Tutor Desk.");
+  let h = `<div class="info muted">Pending lessons read from the portal ${ago(U.refreshed)}</div>`;
+  h += U.lessons.length ? `<div class="box"><span class="lab">Waiting to upload (${U.lessons.length})</span><div class="list">${U.lessons.map((l) => {
+    const change = l.transcript_mins && l.transcript_mins !== l.planned_mins ? ` · ${l.planned_mins} → ${l.transcript_mins} min` : "";
+    return `<div class="line"><span class="grow">${esc(l.student)}<div class="sub">${day(l.day)} · ${l.start}–${l.end}${change}</div>` +
+      (l.description ? `<div class="sub">${esc(l.description)}${l.subject_guess ? " · " + esc(l.subject_guess) : ""}</div>` : "") +
+      (l.note ? `<div class="sub" style="color:var(--warn)">${esc(l.note)}</div>` : "") + `</span>${l.transcript ? chip("Ready", "good") : chip("No transcript", "amber")}</div>`;
+  }).join("")}</div></div>` : box("", `<p class="muted">Nothing waiting to upload.</p>`);
+  if (U.unmatched.length) h += box("Transcripts that matched no lesson", `<div class="list">${U.unmatched.map((t) => `<div class="line"><span class="grow">${esc(t.file)}<div class="sub">${day(t.day)} · ${g(t.hours)} h</div></span></div>`).join("")}</div>`);
+  if (U.odd_names.length) h += box("File names Tutor Desk couldn't read", list(U.odd_names));
+  return h + pcNote("Submitting opens the portal, so it's done on the PC.");
+}
+
+// Live Jobs: each student, with their jobs, homework and boards
+function pageLive() {
+  const L = snap.live, miss = missing(L, "Live Jobs");
+  if (miss) return miss;
+  const rows = L.students;
+  const repKind = (r) => ({Due: "red", Draft: "amber", Submitted: "good", Skipped: "skip"})[r] || "grey";
+  pageLive.after = (el) => tapRows(el, "[data-i]", (d) => {
+    const s = rows[+d.i], hw = s.homework;
+    openSheet(`<div class="muted">${s.next ? "Next: " + esc(s.next) : "No session booked"}</div><h2>${esc(s.name)}</h2>` +
+      `<p class="muted" style="font-size:12px">${s.month_lessons} lesson${s.month_lessons === 1 ? "" : "s"} (${g(s.month_hours)} h) this month · ${s.all_lessons} in all (${g(s.all_hours)} h)${s.last_lesson ? " · last " + day(s.last_lesson) : ""}</p>` +
+      `<p>${s.report_month} report: ${chip(s.report, repKind(s.report))}</p>` +
+      s.jobs.map((j) => `<h3>${esc(j.title || j.id)}</h3><div class="muted" style="font-size:12px">${esc([j.id, j.status, j.goal, j.started ? "started " + j.started : "", j.client_manager].filter(Boolean).join(" · "))}</div>` +
+        (j.summary ? `<p>${esc(j.summary)}</p>` : "") + (j.next_session ? `<p class="muted" style="font-size:12px">Next session on the portal: ${esc(j.next_session)}</p>` : "") +
+        (j.family.length ? `<p class="muted" style="font-size:12px">Family: ${esc(j.family.join(", "))}</p>` : "") +
+        (j.welcome_due ? `<p>${chip("Welcome email to send", "amber")}</p>` : j.welcome_sent ? `<p class="muted" style="font-size:12px">Welcome email sent ${day(j.welcome_sent.slice(0, 10))}</p>` : "") + portalBtn(j.link)).join("") +
+      `<h3>Homework</h3>` + (hw.tasks.length ? `<p class="muted" style="font-size:12px">${hw.checked} checked: ${hw.done} done · ${hw.partly} partly · ${hw.not_done} not done</p>` +
+        `<div class="list">${hw.tasks.map((t) => `<div class="line"><span class="grow">${esc(t.task)}<div class="sub">set ${day(t.set_day)}${t.to_work_on ? " · " + esc(t.to_work_on) : ""}</div></span>${chip(t.label, t.status === "Done" ? "good" : t.status === "pending" ? "grey" : "amber")}</div>`).join("")}</div>` : `<p class="muted">None set yet.</p>`) +
+      `<h3>Whiteboards</h3>` + (s.boards.active.length ? list(s.boards.active.map((b) => (b.label || "Board") + (b.added ? ` (added ${b.added.slice(0, 10)})` : ""))) : `<p class="muted">None saved.</p>`) +
+      (s.boards.old ? `<p class="muted" style="font-size:12px">${s.boards.old} old board${s.boards.old === 1 ? "" : "s"}</p>` : "") +
+      `<p class="muted" style="font-size:12px">Whiteboard links open from Tutor Desk on the PC.</p>`);
+  });
+  return `<div class="info muted">${rows.length} students · Active Jobs read ${ago(L.fetched)}</div>` +
+    rows.map((s, i) => `<div class="job" data-i="${i}"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><b>${esc(s.name)}</b>${s.today ? chip("Today", "acc") : ""}</div>` +
+      `<div class="sub">${s.next ? "Next: " + esc(s.next) : "No session booked"}</div>` +
+      `<div class="sub" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:4px">${s.month_lessons} this month · ${g(s.month_hours)} h ${chip(s.report_month + " report: " + s.report, repKind(s.report))}</div></div>`).join("");
+}
+
+// Audio: the recorder and backup as at the last sync (live meters and mic tests need the PC)
+function pageAudio() {
+  const A = snap.audio, miss = missing(A, "Audio");
+  if (miss) return miss;
+  const state = {recording: ["Recording", "red"], running: ["Recorder running", "good"], off: ["Recorder off", "grey"]}[A.state] || ["Unknown", "grey"];
+  const B = A.backup;
+  return box("Recorder", `<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">${chip(state[0], state[1])}${A.processing ? chip("Processing a lesson", "amber") : ""}${A.muted ? chip("Mic muted", "amber") : ""}</div>` +
+      `<p class="muted" style="font-size:12px">As at the last sync${A.alive_at ? ` (recorder last seen ${ago(A.alive_at)})` : ""} - not live.</p>`, A.state === "recording") +
+    box("Microphones", `<div class="line"><span class="grow">Lesson mic<div class="sub">${esc(A.lesson_mic)}</div></span></div><div class="line"><span class="grow">Notes mic<div class="sub">${esc(A.notes_mic || "none")}</div></span></div>` +
+      A.checks.map((c) => `<div class="line"><span style="color:${c.ok ? "var(--ok)" : "var(--warn)"}">${c.ok ? "✓" : "!"}</span><span class="grow">${esc(c.title)}</span></div>`).join("")) +
+    box("Daily backup", !B.drive_found ? `<p style="color:var(--warn)">The backup drive wasn't found.</p>` :
+      `<p>${B.last_ok ? `Last backed up ${ago(B.last_ok)}` : "Not backed up yet"}${B.size ? ` · ${(B.size / 1048576).toFixed(1)} MB, ${B.files} files` : ""}</p>` +
+      `<p class="muted" style="font-size:12px">${B.kept_days} daily copies kept (up to ${B.keep_daily})</p>` + (B.failed ? `<p style="color:var(--now)">The last backup failed: ${esc(B.error || "")}</p>` : "")) +
+    pcNote("Level meters, mic tests and Mute are on the PC (Audio tab).");
+}
+
 $("reload").addEventListener("click", () => { $("syncedText").textContent = "Checking..."; start(); });
 $("prev").addEventListener("click", () => step(-1));
 $("next").addEventListener("click", () => step(1));
@@ -741,9 +1226,9 @@ function details(e) {
   $("closeSheet").addEventListener("click", () => $("sheet").classList.add("hidden"));
 }
 $("sheet").addEventListener("click", (e) => { if (e.target.id === "sheet") $("sheet").classList.add("hidden"); });
-addEventListener("resize", () => { if (snap) tab === "hours" ? drawHours() : draw(false); });
+addEventListener("resize", () => { if (snap && tab === "hours") drawHours(); else if (snap && tab === "cal") draw(false); });
 document.addEventListener("visibilitychange", () => { if (!document.hidden && snap) start(); });
-setInterval(() => { if (snap && !document.hidden) draw(false); }, 60000);  // keeps the time line and "ago" moving
+setInterval(() => { if (snap && !document.hidden && tab === "cal") draw(false); }, 60000);  // keeps the time line and "ago" moving
 
 document.documentElement.dataset.theme = store.get("theme") || "dark";
 if ("serviceWorker" in navigator) {
